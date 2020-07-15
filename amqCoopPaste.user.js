@@ -61,8 +61,8 @@ function setup() {
     // add Enter key listener for copypasta
 	let quizReadyListener = new Listener("quiz ready", data => {
 		if (quiz.gameMode !== "Ranked") {
-			$("#qpAnswerInput").off("keypress", answerHandler);
-			$("#qpAnswerInput").on("keypress", answerHandler);
+			$("#qpAnswerInput").off("keypress", answerHandler)
+            .on("keypress", answerHandler);
 		}
 		else {
 			$("#qpAnswerInput").off("keypress", answerHandler);
@@ -73,7 +73,10 @@ function setup() {
 	let answerHandler = function (event) {
 		if (event.which === 13 && $("#coopPasteCheckbox").prop("checked")) {
 			gameChat.$chatInputField.val($("#qpAnswerInput").val());
-			gameChat.sendMessage();
+			gameChat.sendMessage(200);
+            $("#qpAnswerInput").off("keypress", answerHandler)
+            .delay()
+            .on("keypress", answerHandler);
 		}
 	}
 
