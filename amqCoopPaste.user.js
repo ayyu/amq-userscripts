@@ -75,9 +75,9 @@ function setup() {
 	let answerHandler = function (event) {
 		if (event.which === 13 && $("#coopPasteCheckbox").prop("checked")) {
 			gameChat.$chatInputField.val($("#qpAnswerInput").val());
-			gameChat.sendMessage(200);
+			gameChat.sendMessage();
             $("#qpAnswerInput").off("keypress", answerHandler)
-            .delay(200)
+            .delay(500)
             .on("keypress", answerHandler);
 		}
 	}
