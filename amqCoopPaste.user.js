@@ -74,12 +74,18 @@ function setup() {
 	});
 
 	// Sends current answer as chat message
-	let answerHandler = debounce( function (event) {
+	/*let answerHandler = debounce( function (event) {
 		if (event.which === 13 && $("#coopPasteCheckbox").prop("checked")) {
 			gameChat.$chatInputField.val($("#qpAnswerInput").val());
 			gameChat.sendMessage();
 		}
-	}, minInterval, true);
+	}, minInterval, true);*/
+	let answerHandler = function (event) {
+		if (event.which === 13 && $("#coopPasteCheckbox").prop("checked")) {
+			gameChat.$chatInputField.val($("#qpAnswerInput").val());
+			gameChat.sendMessage();
+		}
+	};
 
 	quizReadyListener.bindListener();
 
