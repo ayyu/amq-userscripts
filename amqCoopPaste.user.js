@@ -77,7 +77,7 @@ function setup() {
 			gameChat.$chatInputField.val($("#qpAnswerInput").val());
 			gameChat.sendMessage(200);
             $("#qpAnswerInput").off("keypress", answerHandler)
-            .delay()
+            .delay(200)
             .on("keypress", answerHandler);
 		}
 	}
