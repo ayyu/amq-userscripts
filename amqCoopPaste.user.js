@@ -13,7 +13,7 @@
 
 if (!window.setupDocumentDone) return;
 
-let minInterval = 500;
+let minInterval = 200;
 
 let coopWindow;
 
