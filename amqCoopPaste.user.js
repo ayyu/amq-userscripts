@@ -8,7 +8,7 @@
 // @grant        none
 // @require      https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
 // @require      https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqWindows.js
-// @updateURL    https://raw.githubusercontent.com/ayyu/amq-scripts/master/amqCoopPaste.js
+// @updateURL    https://raw.githubusercontent.com/ayyu/amq-scripts/master/amqCoopPaste.user.js
 // ==/UserScript==
 
 if (!window.setupDocumentDone) return;
