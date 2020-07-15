@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         AMQ Co-op Autopaste
 // @namespace    https://github.com/ayyu/
-// @version      1.2
+// @version      1.3
 // @description  Automatically pastes your submitted answer to chat. Piggybacks off TheJoseph98's framework.
 // @author       ayyu
 // @match        https://animemusicquiz.com/*
 // @grant        none
 // @require      https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
 // @require      https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqWindows.js
-// @updateURL    https://raw.githubusercontent.com/ayyu/amq-scripts/master/amqCoopPaste.user.js
+// @downloadURL  https://raw.githubusercontent.com/ayyu/amq-scripts/master/amqCoopPaste.user.js
 // ==/UserScript==
 
 if (!window.setupDocumentDone) return;
