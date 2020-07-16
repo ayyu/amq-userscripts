@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Co-op Autopaste
 // @namespace    https://github.com/ayyu/
-// @version      1.3
+// @version      1.5
 // @description  Automatically pastes your submitted answer to chat. Piggybacks off TheJoseph98's framework.
 // @author       ayyu
 // @match        https://animemusicquiz.com/*
@@ -14,6 +14,7 @@
 if (!window.setupDocumentDone) return;
 
 let minInterval = 200;
+let lastAnswer = "";
 
 let coopWindow;
 
@@ -81,9 +82,11 @@ function setup() {
 		}
 	}, minInterval, true);*/
 	let answerHandler = function (event) {
-		if (event.which === 13 && $("#coopPasteCheckbox").prop("checked")) {
-			gameChat.$chatInputField.val($("#qpAnswerInput").val());
+		var answer = $("#qpAnswerInput").val();
+		if (event.which === 13 && $("#coopPasteCheckbox").prop("checked") && answer != lastAnswer) {
+			gameChat.$chatInputField.val(answer);
 			gameChat.sendMessage();
+			lastAnswer = answer;
 		}
 	};
 
