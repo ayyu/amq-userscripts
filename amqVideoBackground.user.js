@@ -10,12 +10,16 @@
 // @downloadURL  https://raw.githubusercontent.com/ayyu/amq-scripts/master/amqVideoBackground.user.js
 // ==/UserScript==
 
-
 let video = "https://openings.moe/video/KodomoNoJikan-ED01-NCOLD.mp4";
 
 let template = $(`<video id="custom-background" autoplay loop muted><source src="${video}"></video>`);
 
-$("#gameContainer").append(template);
+let opacity = `0.8`;
+
+let bgGray = `rgba(66, 66, 66, ${opacity})`;
+let bgBlack = `rgba(27, 27, 27, ${opacity})`;
+
+$("#mainContainer").append(template);
 
 AMQ_addStyle(`
 #custom-background {
@@ -28,7 +32,21 @@ AMQ_addStyle(`
     z-index: -1;
 }
 
-#gameContainer {
-    background: none;
+#loadingScreen {
+    background-image: none;
+    background-color: ${bgBlack};
 }
+
+body, #mainContainer, #startPage, #gameContainer, #copyBox, #gameChatPage > .col-xs-9 {
+    background: none !important;
+}
+
+#gameChatContainer {
+    background-color: ${bgGray};
+}
+
+.gcList > li:nth-child(2n) {
+    background-color: ${bgGray};
+}
+
 `);
