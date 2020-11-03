@@ -10,7 +10,12 @@
 // @downloadURL  https://raw.githubusercontent.com/ayyu/amq-scripts/master/amqVideoBackground.user.js
 // ==/UserScript==
 
-let video = "https://openings.moe/video/KodomoNoJikan-ED01-NCOLD.mp4";
+let videos = [
+    "https://openings.moe/video/KodomoNoJikan-ED01-NCOLD.mp4",
+    "https://openings.moe/video/KodomoNoJikanNiGakki-OP01-NCOLD.webm"
+];
+
+let video = videos[Math.round(Math.random() * (videos.length - 1))];
 
 let template = $(`<video id="custom-background" autoplay loop muted><source src="${video}"></video>`);
 
