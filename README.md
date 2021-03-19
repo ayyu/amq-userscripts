@@ -4,10 +4,6 @@
 
 Collection of \*monkey userscripts for Anime Music Quiz
 
-## `encoding`
-
-Scripts to make encoding for AMQ more braindead.
-
 ### `amqCoopPaste.user.js`
 
 Kinda defunct now with official teams mode but still gives more XP per right answer if everyone is on their own.
@@ -18,6 +14,10 @@ Maybe I will eventually add the ability to automatically copy paste someone else
 ### `amqVideoBackground.user.js`
 
 Changes AMQ background to the specified video.
+
+## `encoding`
+
+Scripts to make encoding for AMQ more braindead.
 
 ### `amq_encode.sh`
 
