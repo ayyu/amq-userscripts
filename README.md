@@ -21,7 +21,7 @@ Scripts to make encoding for AMQ more braindead.
 
 ### `amq_encode.sh`
 
-bash script that does 2-pass VP9 encoding and tries to normalize audio to -17dB
+bash script that does 2-pass VP9 encoding and tries to normalize audio to -17dB. Generates output files named 720.webm, 480.webm, and audio.mp3.
 
 #### Usage
 
