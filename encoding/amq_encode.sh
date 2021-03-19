@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "Detecting volume of sample..."
-target_volume=-17
+target_volume=-18
 mean_volume=$(ffmpeg "$@" -af volumedetect -f null - |&  awk -F': | dB' '/mean_volume/ {print $2}')
 diff_volume=$(awk "BEGIN {print ($target_volume)-($mean_volume)}")
 echo "mean_volume: $mean_volume"
