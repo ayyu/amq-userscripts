@@ -18,7 +18,6 @@
 
 // ==/UserScript==
 
-if (!window.setupDocumentDone) return;
 if (document.getElementById('startPage')) {
     return;
 }
