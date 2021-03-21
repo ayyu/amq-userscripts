@@ -50,7 +50,7 @@ if (document.getElementById('startPage')) {
 }
 
 function onKeyDown(event) {
-	for (const command in kDAeyBinds) {
+	for (const command in keyBinds) {
 		var currentCommand = keyBinds[command];
 		if (event.key != currentCommand["key"]) {
 			continue;
