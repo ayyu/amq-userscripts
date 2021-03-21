@@ -5,8 +5,8 @@
 // @description  Streamlined version of nyamu's hotkey script that conflicts less with normal usage.
 // @description  Customize hotkeys by editing the keyBinds object.
 // @description  Escape: remove zombie tooltips
-// @description  ~: move cursor focus to chat box
 // @description  `: move cursor focus to answer box
+// @description  Alt + `: move cursor focus to chat box
 // @description  Ctrl + Enter: skip
 // @description  Ctrl + 1: start game if all players are ready
 // @description  Ctrl + 2: start vote for returning to lobby
@@ -45,8 +45,8 @@ var keyBinds = {
 		"key": "`"
 	},
 	"focusChat": {
-		"mod": [],
-		"key": "~"
+		"mod": ["alt"],
+		"key": "`"
 	}
 };
 
@@ -119,12 +119,12 @@ AMQ_addScriptData({
 		<p>Streamlined version of nyamu's hotkey script that conflicts less with normal usage.
 		Customize hotkeys by editing the keyBinds object.</p>
 		<ul>
-		<li>[Escape]: remove zombie tooltips</li>
-		<li>[~]: move cursor focus to chat box</li>
-		<li>[\`]: move cursor focus to answer box</li>
-		<li>[Ctrl + Enter]: skip</li>
-		<li>[Ctrl + 1]: start game if all players are ready</li>
-		<li>[Ctrl + 2]: start vote for returning to lobby</li>
+			<li><kbd>Escape</kbd>: remove zombie tooltips</li>
+			<li><kbd>\`</kbd>: move cursor focus to answer box</li>
+			<li><kbd>Alt</kbd> + <kbd>\`</kbd>: move cursor focus to chat box</li>
+			<li><kbd>Ctrl</kbd> + <kbd>Enter</kbd>: vote skip</li>
+			<li><kbd>Ctrl</kbd> + <kbd>1</kbd>: start game if all players are ready</li>
+			<li><kbd>Ctrl</kbd> + <kbd>2</kbd>: start vote for returning to lobby</li>
 		</ul>
 	`
 });
