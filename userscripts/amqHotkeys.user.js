@@ -18,6 +18,11 @@
 
 // ==/UserScript==
 
+if (!window.setupDocumentDone) return;
+if (document.getElementById('startPage')) {
+    return;
+}
+
 var keyBinds = {
 	"clearTooltips": {
 		"mod": [],
@@ -44,11 +49,6 @@ var keyBinds = {
 		"key": "~"
 	}
 };
-
-
-if (document.getElementById('startPage')) {
-    return;
-}
 
 function onKeyDown(event) {
 	for (const command in keyBinds) {
@@ -110,7 +110,7 @@ keyBinds.focusChat.callback = function() {
 	$("#gcInput").focus();
 }
 
-$(document).on("keydown", onKeyDown);
+document.addEventListener('keydown', onKeyDown, false);
 
 AMQ_addScriptData({
     name: "Hotkey Functions",
