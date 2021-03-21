@@ -17,19 +17,21 @@ cpu_settings="-deadline good -cpu-used 1 -row-mt 1 -frame-parallel 0 -tile-colum
 
 for scale in 480 720
 do
-	ffmpeg "$@" \
+	ffmpeg \
 		$map_settings \
 		$video_settings \
 		-an \
 		$cpu_settings \
 		-vf "scale=-1:$scale" \
+		"$@" \
 		-pass 1 -f null /dev/null && \
-	ffmpeg "$@" \
+	ffmpeg \
 		$map_settings \
 		$video_settings \
 		$opus_settings \
 		$cpu_settings \
 		-vf "scale=-1:$scale" \
+		"$@" \
 		-pass 2 -f webm "$scale.webm"
 done
 
