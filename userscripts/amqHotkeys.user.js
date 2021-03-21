@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Hotkey Functions
 // @namespace    https://github.com/ayyu/amq-scripts
-// @version      0.1
+// @version      0.2
 // @description  Streamlined version of nyamu's hotkey script that conflicts less with normal usage.
 // @description  Customize hotkeys by editing the keyBinds object.
 // @description  Escape: remove zombie tooltips
@@ -41,7 +41,7 @@ var keyBinds = {
 	"focusChat": {
 		"mod": [],
 		"key": "~"
-	},
+	}
 };
 
 
@@ -51,11 +51,11 @@ if (document.getElementById('startPage')) {
 
 function onKeyDown(event) {
 	for (const command in keyBinds) {
-		var currentCommand = keyBinds[command];
+    var currentCommand = keyBinds[command];
 		if (event.key != currentCommand["key"]) {
 			continue;
 		}
-		var matchesMods = true;
+    var matchesMods = true;
 		for (const mod in currentCommand["mod"]) {
 			modProp = currentCommand["mod"] + "Key";
 			if (!(modProp in event) || !event[modProp]) {
@@ -66,15 +66,17 @@ function onKeyDown(event) {
 		if (!matchesMods) {
 			continue;
 		}
-		window[command]();
+    event.preventDefault();
+    event.stopPropagation();
+		keyBinds[command].callback();
 	}
 }
 
-function clearTooltips() {
+keyBinds.clearTooltips.callback = function() {
 	$("[id^=tooltip]").remove(); $("[id^=popover]").remove();
 }
 
-function startLobby() {
+keyBinds.startLobby.callback = function() {
 	if (lobby.isHost &&
 		lobby.numberOfPlayers > 0 &&
 		lobby.numberOfPlayers == lobby.numberOfPlayersReady) {
@@ -82,7 +84,7 @@ function startLobby() {
 	}
 }
 
-function returnLobby() {
+keyBinds.returnLobby.callback = function() {
 	if (lobby.isHost &&
 		quiz.inQuiz &&
 		hostModal.gameMode !== 'Ranked') {
@@ -90,19 +92,19 @@ function returnLobby() {
 	}
 }
 
-function voteSkip() {
+keyBinds.voteSkip.callback = function() {
 	if (!quiz.isSpectator) {
 		quiz.skipClicked()
 	}
 }
 
-function focusAnswer() {
+keyBinds.focusAnswer.callback = function() {
 	$("#gcInput").blur();
 	quiz.setInputInFocus(true);
 	$("#qpAnswerInput").focus();
 }
 
-function focusChat() {
+keyBinds.focusChat.callback = function() {
 	quiz.setInputInFocus(false);
 	$("#gcInput").focus();
 }
