@@ -6,7 +6,7 @@
 // @description  Customize hotkeys by editing the keyBinds object.
 // @description  Escape: remove zombie tooltips
 // @description  `: move cursor focus to answer box
-// @description  Alt + `: move cursor focus to chat box
+// @description  Ctrl + `: move cursor focus to chat box
 // @description  Ctrl + Enter: skip
 // @description  Ctrl + 1: start game if all players are ready
 // @description  Ctrl + 2: start vote for returning to lobby
@@ -45,7 +45,7 @@ var keyBinds = {
 		"key": "`"
 	},
 	"focusChat": {
-		"mod": ["alt"],
+		"mod": ["ctrl"],
 		"key": "`"
 	}
 };
@@ -121,7 +121,7 @@ AMQ_addScriptData({
 		<ul>
 			<li><kbd>Escape</kbd>: remove zombie tooltips</li>
 			<li><kbd>\`</kbd>: move cursor focus to answer box</li>
-			<li><kbd>Alt</kbd> + <kbd>\`</kbd>: move cursor focus to chat box</li>
+			<li><kbd>Ctrl</kbd> + <kbd>\`</kbd>: move cursor focus to chat box</li>
 			<li><kbd>Ctrl</kbd> + <kbd>Enter</kbd>: vote skip</li>
 			<li><kbd>Ctrl</kbd> + <kbd>1</kbd>: start game if all players are ready</li>
 			<li><kbd>Ctrl</kbd> + <kbd>2</kbd>: start vote for returning to lobby</li>
