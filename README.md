@@ -21,7 +21,7 @@ Streamlined version of nyamu's hotkey script that conflicts less with normal usa
 
 #### Default bindings:
 
-- <kdb>Escape</kdb>: remove zombie tooltips
+- <kbd>Escape</kbd>: remove zombie tooltips
 - <kbd>~</kbd>: move cursor focus to chat box
 - <kbd>\`</kbd>: move cursor focus to answer box
 - <kbd>Ctrl</kbd> + <kbd>Enter</kbd>: skip
