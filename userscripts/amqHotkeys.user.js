@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         AMQ Hotkey Functions
 // @namespace    https://github.com/ayyu/amq-scripts
-// @version      0.2
+// @version      0.3
 // @description  Streamlined version of nyamu's hotkey script that conflicts less with normal usage.
 // @description  Customize hotkeys by editing the keyBinds object.
 // @description  Escape: remove zombie tooltips
 // @description  `: move cursor focus to answer box
-// @description  Ctrl + `: move cursor focus to chat box
+// @description  Alt + `: move cursor focus to chat box
 // @description  Ctrl + Enter: skip
 // @description  Ctrl + 1: start game if all players are ready
 // @description  Ctrl + 2: start vote for returning to lobby
@@ -44,7 +44,7 @@ var keyBinds = {
 		"key": "`"
 	},
 	"focusChat": {
-		"mod": ["ctrl"],
+		"mod": ["alt"],
 		"key": "`"
 	}
 };
@@ -56,16 +56,16 @@ function onKeyDown(event) {
 			continue;
 		}
     var matchesMods = true;
-		for (const mod in currentCommand["mod"]) {
-			modProp = currentCommand["mod"] + "Key";
-			if (!(modProp in event) || !event[modProp]) {
-				matchesMods = false;
-				break;
-			}
+	for (const mod in currentCommand["mod"]) {
+		modProp = currentCommand["mod"] + "Key";
+		if (!(modProp in event) || !event[modProp]) {
+			matchesMods = false;
+			break;
 		}
-		if (!matchesMods) {
-			continue;
-		}
+	}
+	if (!matchesMods) {
+		continue;
+	}
     event.preventDefault();
     event.stopPropagation();
 		keyBinds[command].callback();
@@ -120,7 +120,7 @@ AMQ_addScriptData({
 		<ul>
 			<li><kbd>Escape</kbd>: remove zombie tooltips</li>
 			<li><kbd>\`</kbd>: move cursor focus to answer box</li>
-			<li><kbd>Ctrl</kbd> + <kbd>\`</kbd>: move cursor focus to chat box</li>
+			<li><kbd>Alt</kbd> + <kbd>\`</kbd>: move cursor focus to chat box</li>
 			<li><kbd>Ctrl</kbd> + <kbd>Enter</kbd>: vote skip</li>
 			<li><kbd>Ctrl</kbd> + <kbd>1</kbd>: start game if all players are ready</li>
 			<li><kbd>Ctrl</kbd> + <kbd>2</kbd>: start vote for returning to lobby</li>
