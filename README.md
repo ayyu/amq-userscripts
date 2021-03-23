@@ -22,8 +22,8 @@ Streamlined version of nyamu's hotkey script that conflicts less with normal usa
 #### Default bindings:
 
 - <kbd>Escape</kbd>: remove zombie tooltips
-- <kbd>\`</kbd>: move cursor focus to answer box
-- <kbd>Alt</kbd> + <kbd>\`</kbd>: move cursor focus to chat box
+- <kbd>Tab</kbd>: move cursor focus to answer box
+- <kbd>Shift</kbd> + <kbd>Tab</kbd>: move cursor focus to chat box
 - <kbd>Ctrl</kbd> + <kbd>Enter</kbd>: skip
 - <kbd>Ctrl</kbd> + <kbd>1</kbd>: start game if all players are ready
 - <kbd>Ctrl</kbd> + <kbd>2</kbd>: start vote for returning to lobby
