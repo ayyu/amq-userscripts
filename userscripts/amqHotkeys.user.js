@@ -19,7 +19,7 @@
 // ==/UserScript==
 
 if (document.getElementById('startPage')) {
-    return;
+	return;
 }
 
 var keyBinds = {
@@ -51,11 +51,11 @@ var keyBinds = {
 
 function onKeyDown(event) {
 	for (const command in keyBinds) {
-    var currentCommand = keyBinds[command];
+	var currentCommand = keyBinds[command];
 		if (event.key != currentCommand["key"]) {
 			continue;
 		}
-    var matchesMods = true;
+	var matchesMods = true;
 	for (const mod in currentCommand["mod"]) {
 		modProp = currentCommand["mod"] + "Key";
 		if (!(modProp in event) || !event[modProp]) {
@@ -66,8 +66,8 @@ function onKeyDown(event) {
 	if (!matchesMods) {
 		continue;
 	}
-    event.preventDefault();
-    event.stopPropagation();
+	event.preventDefault();
+	event.stopPropagation();
 		keyBinds[command].callback();
 	}
 }
@@ -99,9 +99,11 @@ keyBinds.voteSkip.callback = function() {
 }
 
 keyBinds.focusAnswer.callback = function() {
-	$("#gcInput").blur();
-	quiz.setInputInFocus(true);
-	$("#qpAnswerInput").focus();
+	if (!quiz.isSpectator) {
+		$("#gcInput").blur();
+		quiz.setInputInFocus(true);
+		$("#qpAnswerInput").focus();
+	}
 }
 
 keyBinds.focusChat.callback = function() {
@@ -112,9 +114,9 @@ keyBinds.focusChat.callback = function() {
 document.addEventListener('keydown', onKeyDown, false);
 
 AMQ_addScriptData({
-    name: "Hotkey Functions",
-    author: "ayyu",
-    description: `
+	name: "Hotkey Functions",
+	author: "ayyu",
+	description: `
 		<p>Streamlined version of nyamu's hotkey script that conflicts less with normal usage.
 		Customize hotkeys by editing the keyBinds object.</p>
 		<ul>
