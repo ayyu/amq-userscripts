@@ -28,11 +28,11 @@ var keyBinds = {
 		"key": "Escape"
 	},
 	"startLobby": {
-		"mod": ["ctrl"],
+		"mod": ["alt"],
 		"key": "1"
 	},
 	"returnLobby": {
-		"mod": ["ctrl"],
+		"mod": ["alt"],
 		"key": "2"
 	},
 	"voteSkip": {
