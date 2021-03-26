@@ -25,8 +25,8 @@ Streamlined version of nyamu's hotkey script that conflicts less with normal usa
 - <kbd>Tab</kbd>: move cursor focus to answer box
 - <kbd>Shift</kbd> + <kbd>Tab</kbd>: move cursor focus to chat box
 - <kbd>Ctrl</kbd> + <kbd>Enter</kbd>: skip
-- <kbd>Ctrl</kbd> + <kbd>1</kbd>: start game if all players are ready
-- <kbd>Ctrl</kbd> + <kbd>2</kbd>: start vote for returning to lobby
+- <kbd>Alt</kbd> + <kbd>1</kbd>: start game if all players are ready
+- <kbd>Alt</kbd> + <kbd>2</kbd>: start vote for returning to lobby
 
 
 ## `encoding`
@@ -35,7 +35,7 @@ Scripts to make encoding for AMQ more braindead.
 
 ### `amq_encode.sh`
 
-bash script that does 2-pass VP9 encoding with CRF 20 and tries to normalize audio to -17dB. Generates output files named `720.webm`, `480.webm`, and `audio.mp3`.
+bash script that does 2-pass VP9 encoding with CRF 20. Generates output files named `720.webm`, `480.webm`, and `audio.mp3`.
 
 #### Usage
 
@@ -43,9 +43,25 @@ Same as ffmpeg for input files/timing. Put it in your home directory so you can 
 
 ```bash
 # example usages
-~/amq_encode.sh -i INPUTFILE
-~/amq_encode.sh -i INPUTFILE -ss START -to END
-~/amq_encode.sh -i INPUTFILE -ss START -t SECONDS
+~/amq_encode.sh -i INPUTFILE.mkv
+~/amq_encode.sh -i INPUTFILE.avi -ss START -to END
+~/amq_encode.sh -i INPUTFILE.mp4 -ss START -t SECONDS
 ```
 
 Windows version coming never cuz batch syntax is awful.
+
+### `amq_volume.sh`
+
+Tries to normalize audio to -18dB.
+
+#### Usage
+
+Same as ffmpeg for input files/timing. Put it in your home directory so you can call it with `~/amq_volume.sh`
+
+You must specify an output format using the `-f` option (i.e. `mp3` or `webm`). An output file named `normalized` will be created, but without the correct file extension.
+
+```bash
+# example usages
+~/amq_volume.sh -i INPUTFILE.webm -f webm
+~/amq_volume.sh -i INPUTFILE.mp3 -f mp3
+```

@@ -8,8 +8,8 @@
 // @description  Tab: move cursor focus to answer box
 // @description  Shift + Tab: move cursor focus to chat box
 // @description  Ctrl + Enter: skip
-// @description  Ctrl + 1: start game if all players are ready
-// @description  Ctrl + 2: start vote for returning to lobby
+// @description  Alt + 1: start game if all players are ready
+// @description  Alt + 2: start vote for returning to lobby
 // @author       ayyu
 // @match        https://animemusicquiz.com/*
 // @grant        none
@@ -124,8 +124,8 @@ AMQ_addScriptData({
 			<li><kbd>Tab</kbd>: move cursor focus to answer box</li>
 			<li><kbd>Shift</kbd> + <kbd>Tab</kbd>: move cursor focus to chat box</li>
 			<li><kbd>Ctrl</kbd> + <kbd>Enter</kbd>: vote skip</li>
-			<li><kbd>Ctrl</kbd> + <kbd>1</kbd>: start game if all players are ready</li>
-			<li><kbd>Ctrl</kbd> + <kbd>2</kbd>: start vote for returning to lobby</li>
+			<li><kbd>Alt</kbd> + <kbd>1</kbd>: start game if all players are ready</li>
+			<li><kbd>Alt</kbd> + <kbd>2</kbd>: start vote for returning to lobby</li>
 		</ul>
 	`
 });
