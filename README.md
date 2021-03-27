@@ -58,10 +58,8 @@ Tries to normalize audio to -18dB.
 
 Same as ffmpeg for input files/timing. Put it in your home directory so you can call it with `~/amq_volume.sh`
 
-You must specify an output format using the `-f` option (i.e. `mp3` or `webm`). An output file named `normalized` will be created, but without the correct file extension.
-
 ```bash
 # example usages
-~/amq_volume.sh -i INPUTFILE.webm -f webm
-~/amq_volume.sh -i INPUTFILE.mp3 -f mp3
+~/amq_volume.sh -i INPUTFILE.webm	# output: INPUTFILE-norm.webm
+~/amq_volume.sh -i INPUTFILE.mp3	# output: INPUTFILE-norm.mp3
 ```
