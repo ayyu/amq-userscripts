@@ -17,10 +17,10 @@ do
 	esac
 done
 
-target_mean=-18.0
+source "${BASH_SOURCE%/*}/amq_settings.sh"
 
 echo "Detecting volume of sample for ${file}..."
-output=$(ffmpeg $@ -af volumedetect -f null /dev/null 2>&1)
+output=$(ffmpeg $@ -vn -af volumedetect -f null /dev/null 2>&1)
 mean_volume=`echo "$output" | awk -F': | dB' '/mean_volume/ {print $2}'`
 max_volume=`echo "$output" | awk -F': | dB' '/max_volume/ {print $2}'`
 diff_mean=$(awk "BEGIN {print ($target_mean)-($mean_volume)}")

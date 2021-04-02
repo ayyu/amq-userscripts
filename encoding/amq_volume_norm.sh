@@ -19,17 +19,23 @@ done
 
 source "${BASH_SOURCE%/*}/amq_volume_detect.sh" $@
 
-extension="${file##*.}"
 filename="${file%.*}"
+extension="${file##*.}"
 
-format_settings="-c:v copy"
+source "${BASH_SOURCE%/*}/amq_settings.sh"
 
-if [ $extension = "mp3" ]; then
-	format_settings="-vn -c:a libmp3lame"
+if [[ $extension = "mp3" ]]; then
+	format_settings="-vn $mp3_settings"
+else
+	format_settings="-c:v copy $opus_settings"
 fi
 
 out_dir="norm"
 
 mkdir -p "$out_dir"
 
-ffmpeg -y $@ $format_settings -map_metadata -1 -b:a 320k -ac 2 -af "volume=${diff_mean}dB" "$out_dir/${filename}.${extension}"
+ffmpeg -y $@ \
+	$meta_settings \
+	$format_settings \
+	-af "volume=${diff_mean}dB" \
+	-f $extension $out_dir/${filename}.${extension}
