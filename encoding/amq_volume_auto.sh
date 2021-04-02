@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-for file in 480.webm 720.webm audio.mp3
+in_dir="source"
+
+for file in $in_dir/*
 do
-	source "${BASH_SOURCE%/*}/amq_volume_norm.sh" -i $file
+	bash "${BASH_SOURCE%/*}/amq_volume_norm.sh" -i "$file"
 done

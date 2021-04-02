@@ -13,7 +13,7 @@ while getopts hi: flag
 do
 	case "${flag}" in
 		h) usage;;
-		i) file=${OPTARG};;
+		i) file=$(basename ${OPTARG});;
 	esac
 done
 
