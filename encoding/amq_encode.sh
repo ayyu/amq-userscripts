@@ -24,6 +24,7 @@ cpu_settings="-deadline good -cpu-used 1 -row-mt 1 -frame-parallel 0 -tile-colum
 for scale in 480 720
 do
 	ffmpeg \
+		-y \
 		"$@" \
 		$map_settings \
 		$video_settings \
@@ -32,6 +33,7 @@ do
 		-vf "scale=-1:$scale,setsar=1${vf}" \
 		-pass 1 -f null /dev/null && \
 	ffmpeg \
+		-y \
 		"$@" \
 		$map_settings \
 		$video_settings \
@@ -41,4 +43,4 @@ do
 		-pass 2 -f webm "$scale.webm"
 done
 
-ffmpeg "$@" $mp3_settings audio.mp3
+ffmpeg -y "$@" $mp3_settings audio.mp3
