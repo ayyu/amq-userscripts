@@ -35,7 +35,8 @@ Scripts to make encoding for AMQ more braindead.
 
 ### `amq_encode.sh`
 
-bash script that does 2-pass VP9 encoding with CRF 20. Generates output files named `720.webm`, `480.webm`, and `audio.mp3` in a folder name `source`.
+bash script that does 2-pass VP9 encoding with CRF 20. Generates output files named `720.webm`, `480.webm`, and `audio.mp3`.
+ Outputs to directory `./source/`
 
 #### Usage
 
@@ -52,7 +53,8 @@ Windows version coming never cuz batch syntax is awful.
 
 ### `amq_volume_norm.sh`
 
-Normalize audio to -18dB while avoiding clipping above 0 dB. Outputs to directory `./norm/`
+Normalize audio to -18dB while avoiding clipping above 0 dB.
+Outputs to directory `./norm/`
 
 #### Usage
 
@@ -79,6 +81,7 @@ Applies `amq_volume_norm.sh` to all files in the specified directory.
 
 Muxes a clean audio track to all files in the specified input directory. Make sure your clean audio file is sync'd to and already about the same length as the video files.
 This will ignore an existing MP3 file in the input directory and instead encode directly from your clean file to a new MP3.
+Outputs to directory `./clean/`
 
 #### Usage
 
