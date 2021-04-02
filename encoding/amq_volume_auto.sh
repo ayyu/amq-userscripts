@@ -14,5 +14,11 @@ do
 	extension="${file##*.}"
 	filename="${file%.*}"
 
-	ffmpeg -i "$file" -c:v copy -af "volume=${diff_volume}dB" "${filename}-norm.${extension}"
+	format_settings="-c:v copy"
+
+	if [ $extension = "mp3" ]; then
+		format_settings="-vn -c:a libmp3lame"
+	fi
+
+	ffmpeg -i "$file" $format_settings -b:a 320k -ac 2 -af "volume=${diff_volume}dB" "${filename}-norm.${extension}"
 done
