@@ -36,7 +36,7 @@ Scripts to make encoding for AMQ more braindead.
 ### `amq_encode.sh`
 
 bash script that does 2-pass VP9 encoding with CRF 20. Generates output files named `720.webm`, `480.webm`, and `audio.mp3`.
- Outputs to directory `./source/`
+Outputs to directory `./source/`
 
 #### Usage
 
@@ -98,7 +98,7 @@ Wrapper for the `-af volumedetect` filter in ffmpeg. Extracts values for `mean_v
 
 Shared settings between the scripts, including things like desired audio levels and audio bitrates. Place this in the same directory as the other scripts or none of them will work.
 
-### `encode.sh`
+### `sample_encode.sh`
 
 An example script that does the following:
 
