@@ -4,9 +4,19 @@ crf=20
 vf=""
 af=""
 
-while getopts i:vf:af:crf: flag
+usage () {
+	cat <<EOM
+Usage: $(basename $0) -i <file> [...]
+-i     input file
+...    ffmpeg flags
+EOM
+	exit 1
+}
+
+while getopts hi:vf:af:crf: flag
 do
 	case "${flag}" in
+		h) usage;;
 		i) file=${OPTARG};;
 		vf) vf=,${OPTARG};;
 		af) af="-af ${OPTARG}";;

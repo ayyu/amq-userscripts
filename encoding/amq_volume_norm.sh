@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
 
-while getopts i: flag
+usage () {
+	cat <<EOM
+Usage: $(basename $0) -i <file> [...]
+-i     input file
+...    ffmpeg flags
+EOM
+	exit 1
+}
+
+while getopts hi: flag
 do
 	case "${flag}" in
+		h) usage;;
 		i) file=${OPTARG};;
 	esac
 done
