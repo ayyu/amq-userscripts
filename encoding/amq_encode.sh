@@ -18,7 +18,7 @@ while getopts hi:vf:af:crf: flag
 do
 	case "${flag}" in
 		h) usage;;
-		i) file=$(basename ${OPTARG});;
+		i) file=${OPTARG};;
 		vf) vf=,${OPTARG};;
 		af) af="-af ${OPTARG}";;
 		crf) crf=${OPTARG};;
@@ -32,32 +32,40 @@ video_settings="-c:v libvpx-vp9 -b:v 0 -g 119 -crf $crf -pix_fmt yuv420p"
 cpu_settings="-deadline good -cpu-used 1 -row-mt 1 -frame-parallel 0 -tile-columns 2 -tile-rows 0 -threads 4"
 
 mkdir -p $out_dir
+echo "outputs to $out_dir"
 
-echo map_settings
+source_height=$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=nw=1:nk=1 $file)
+echo "source height is $source_height"
 
 for scale in 480 720
 do
-	ffmpeg \
-		-y "$@" \
-		$map_settings \
-		$meta_settings \
-		$video_settings \
-		-an \
-		$cpu_settings \
-		-vf "scale=-1:$scale,setsar=1${vf}" \
-		-pass 1 -f null /dev/null && \
-	ffmpeg \
-		-y "$@" \
-		$map_settings \
-		$meta_settings \
-		$video_settings \
-		$opus_settings \
-		$cpu_settings \
-		$af \
-		-vf "scale=-1:$scale,setsar=1${vf}" \
-		-pass 2 -f webm $out_dir/$scale.webm
+	if [[ "$source_height" -ge "$scale" ]]; then
+		echo "encoding $scale"
+		ffmpeg \
+			-y "$@" \
+			$map_settings \
+			$meta_settings \
+			$video_settings \
+			-an \
+			$cpu_settings \
+			-vf "scale=-1:$scale,setsar=1${vf}" \
+			-pass 1 -f null /dev/null && \
+		ffmpeg \
+			-y "$@" \
+			$map_settings \
+			$meta_settings \
+			$video_settings \
+			$opus_settings \
+			$cpu_settings \
+			$af \
+			-vf "scale=-1:$scale,setsar=1${vf}" \
+			-pass 2 -f webm $out_dir/$scale.webm
+	else
+		echo "skipping $scale"
+	fi
 done
 
+echo "encoding mp3"
 ffmpeg \
 	-y "$@" \
 	$meta_settings \

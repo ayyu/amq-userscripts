@@ -34,7 +34,8 @@ out_dir="norm"
 
 mkdir -p "$out_dir"
 
-ffmpeg -y $@ \
+ffmpeg \
+	-y $@ \
 	$meta_settings \
 	$format_settings \
 	-af "volume=${diff_mean}dB" \
