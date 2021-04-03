@@ -33,6 +33,8 @@ Streamlined version of nyamu's hotkey script that conflicts less with normal usa
 
 Scripts to make encoding for AMQ more braindead.
 
+All of these require `ffmpeg` and `ffprobe` to be installed on your machine.
+
 ### `amq_encode.sh`
 
 bash script that does 2-pass VP9 encoding with CRF 20. Generates output files named `720.webm`, `480.webm`, and `audio.mp3`.
