@@ -14,16 +14,27 @@ EOM
 	exit 1
 }
 
-while getopts hi:vf:af:crf: flag
+while [[ $# -gt 0 ]]; 
 do
-	case "${flag}" in
-		h) usage;;
-		i) file=${OPTARG};;
-		vf) vf=,${OPTARG};;
-		af) af="-af ${OPTARG}";;
-		crf) crf=${OPTARG};;
+	flag="$1"
+	case $flag in
+	    -h) usage
+		shift; shift;;
+	    -i) file=$2
+	    shift; shift;;
+	    -vf) vf=",$2"
+		shift; shift;;
+		-af) af="-af $2"
+		shift; shift;;
+		-crf) crf=$2
+		shift; shift;;
+	    *)    # unknown option
+	    POSITIONAL+=("$1") # save it in an array for later
+	    shift # past argument
+	    ;;
 	esac
 done
+set -- "${POSITIONAL[@]}" # restore positional parameters
 
 source "${BASH_SOURCE%/*}/amq_settings.sh"
 
@@ -42,23 +53,23 @@ do
 	if [[ "$source_height" -ge "$scale" ]]; then
 		echo "encoding $scale"
 		ffmpeg \
-			-y "$@" \
+			-y -i $file $@ \
 			$map_settings \
 			$meta_settings \
 			$video_settings \
 			-an \
 			$cpu_settings \
-			-vf "scale=-1:$scale,setsar=1${vf}" \
+			-vf "scale=-1:$scale,setsar=1$vf" \
 			-pass 1 -f null /dev/null && \
 		ffmpeg \
-			-y "$@" \
+			-y -i $file $@ \
 			$map_settings \
 			$meta_settings \
 			$video_settings \
 			$opus_settings \
 			$cpu_settings \
 			$af \
-			-vf "scale=-1:$scale,setsar=1${vf}" \
+			-vf "scale=-1:$scale,setsar=1$vf" \
 			-pass 2 -f webm $out_dir/$scale.webm
 	else
 		echo "skipping $scale"
@@ -67,7 +78,7 @@ done
 
 echo "encoding mp3"
 ffmpeg \
-	-y "$@" \
+	-y -i $file $@ \
 	$meta_settings \
 	-vn \
 	$mp3_settings \

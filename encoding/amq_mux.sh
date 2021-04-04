@@ -12,7 +12,7 @@ EOM
 in_audio="clean.wav"
 in_dir="source"
 
-while getopts hi: flag
+while getopts ha:i: flag
 do
 	case "${flag}" in
 		h) usage;;
