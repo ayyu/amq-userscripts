@@ -50,7 +50,7 @@ echo "source height is $source_height"
 
 for scale in 480 720
 do
-	if [[ "$source_height" -ge "$scale" ]]; then
+	if [[ "$source_height" -ge "$scale" || "$scale" -eq 480 ]]; then
 		echo "encoding $scale"
 		ffmpeg \
 			-y -i $file $@ \
