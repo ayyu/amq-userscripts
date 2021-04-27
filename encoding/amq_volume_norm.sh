@@ -38,5 +38,5 @@ ffmpeg \
 	-y $@ \
 	$meta_settings \
 	$format_settings \
-	-af "volume=${diff_mean}dB" \
+	-af "volume=${diff_clip}dB" \
 	-f $extension $out_dir/${filename}.${extension}
