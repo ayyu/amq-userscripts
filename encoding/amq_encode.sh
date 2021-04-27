@@ -53,7 +53,7 @@ do
 	if [[ "$source_height" -ge "$scale" || "$scale" -eq 480 ]]; then
 		echo "encoding $scale"
 		ffmpeg \
-			-y -i $file $@ \
+			-y -i "$file" $@ \
 			$map_settings \
 			$meta_settings \
 			$video_settings \
@@ -62,7 +62,7 @@ do
 			-vf "scale=-1:$scale,setsar=1$vf" \
 			-pass 1 -f null /dev/null && \
 		ffmpeg \
-			-y -i $file $@ \
+			-y -i "$file" $@ \
 			$map_settings \
 			$meta_settings \
 			$video_settings \
@@ -78,7 +78,7 @@ done
 
 echo "encoding mp3"
 ffmpeg \
-	-y -i $file $@ \
+	-y -i "$file" $@ \
 	$meta_settings \
 	-vn \
 	$mp3_settings \

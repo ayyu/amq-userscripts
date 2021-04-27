@@ -33,13 +33,13 @@ do
 
 	if [[ $extension == "mp3" ]]; then
 		ffmpeg \
-			-y -i $in_audio \
+			-y -i "$in_audio" \
 			$mp3_settings \
 			-f mp3 $out_dir/$filename.$extension
 	else
 		ffmpeg \
-			-y -i $file \
-			-i $in_audio \
+			-y -i "$file" \
+			-i "$in_audio" \
 			-shortest -map 0:v -map 1:a \
 			-c:v copy \
 			$opus_settings \
