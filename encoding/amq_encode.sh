@@ -19,10 +19,10 @@ do
 	flag="$1"
 	case $flag in
 	    -h) usage
-		shift; shift;;
+	 	shift;;
 	    -i) file=$2
 	    shift; shift;;
-	    -vf) vf=",$2"
+	    -vf) vf="$2,"
 		shift; shift;;
 		-af) af="-af $2"
 		shift; shift;;
@@ -59,7 +59,7 @@ do
 			$video_settings \
 			-an \
 			$cpu_settings \
-			-vf "scale=-1:$scale,setsar=1$vf" \
+			-vf "${vf}scale=-1:$scale,setsar=1" \
 			-pass 1 -f null /dev/null && \
 		ffmpeg \
 			-y -i "$file" $@ \
@@ -69,7 +69,7 @@ do
 			$opus_settings \
 			$cpu_settings \
 			$af \
-			-vf "scale=-1:$scale,setsar=1$vf" \
+			-vf "${vf}scale=-1:$scale,setsar=1" \
 			-pass 2 -f webm $out_dir/$scale.webm
 	else
 		echo "skipping $scale"
