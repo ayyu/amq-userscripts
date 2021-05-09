@@ -83,6 +83,12 @@ function setup() {
 		quizJoinHandler(data);
 	}).bindListener();
 
+	// clear upon new song last answer
+	new Listener("answer results", (data) => {
+		lastAnswer = "";
+	}).bindListener();
+
+	// enter answers that are pasted
 	new Listener("Game Chat Message", (payload) => {
 		messageHandler(payload);
 	}).bindListener();
