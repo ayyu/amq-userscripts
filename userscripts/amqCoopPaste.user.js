@@ -68,7 +68,7 @@ function setup() {
 		msg = (coopPaste ? "Disabled" : "Enabled") + " co-op paste to chat.";
 		gameChat.systemMessage(msg);
 		coopPaste = !coopPaste;
-		$(`#qpCoopButton i`).toggleClass('fas', coopPaste).toggleClass('fa', !coopPaste);
+		$(`#qpCoopButton i`).toggleClass('fa-inverse', coopPaste);
 	});
 
 	// Adds button to in-game options to enable paster
