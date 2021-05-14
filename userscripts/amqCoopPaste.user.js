@@ -58,7 +58,7 @@ function messageHandler(payload) {
 
 function setup() {
 
-	coopButton = $(`<div id="qpCoopButton" class="clickAble qpOption"><i aria-hidden="true" class="fa fa-paste qpMenuItem"></i></div>`);
+	coopButton = $(`<div id="qpCoopButton" class="clickAble qpOption"><i aria-hidden="true" class="fa fa-clipboard qpMenuItem"></i></div>`);
 	coopButton.popover({
 		placement: "bottom",
 		content: "Toggle co-op copy paste to chat",
