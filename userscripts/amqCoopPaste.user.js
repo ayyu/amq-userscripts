@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AMQ Co-op Autopaste
 // @namespace    https://github.com/ayyu/
-// @version      1.6
-// @description  Automatically pastes your submitted answer to chat.
+// @version      1.8
+// @description  Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.
 // @author       ayyu
 // @match        https://animemusicquiz.com/*
 // @grant        none
@@ -50,7 +50,7 @@ function answerHandler(event) {
 
 function messageHandler(payload) {
 	message = payload.message;
-	if (re.test(message)) {
+	if (re.test(message) && coopPaste) {
 		answer = message.replace(re, '');
 		quiz.answerInput.setNewAnswer(answer);
 	}
@@ -68,6 +68,7 @@ function setup() {
 		msg = (coopPaste ? "Disabled" : "Enabled") + " co-op paste to chat.";
 		gameChat.systemMessage(msg);
 		coopPaste = !coopPaste;
+		$(`#qpCoopButton i`).toggleClass('fas', coopPaste).toggleClass('fa', !coopPaste);
 	});
 
 	// Adds button to in-game options to enable paster
