@@ -149,7 +149,7 @@
     @emoji-size: 24px;
     @line-height: 1.2em;
 
-    #gameChatContainer {
+    #gcMessageContainer {
         .amqEmoji,
         .emoji {
             max-width: @emoji-size;
