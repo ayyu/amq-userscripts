@@ -20,6 +20,10 @@
     .small-text-shadow(@color) {
         text-shadow: 0 0 2px @color;
     }
+    
+    .outline(@size, @color) {
+        outline: @size solid @color;
+    }
 
     .outline-shadow(@size, @color) {
         outline: @size solid @color;
@@ -53,7 +57,10 @@
         }
     }
 
-    #qpAnswerInputContainer.focused,
+    #qpAnswerInputContainer.focused {
+        .outline(1px, @focus-color);
+    }
+    
     #qpReturnLobbyVoteContainer {
         .outline-shadow(1px, @focus-color);
     }
@@ -148,7 +155,18 @@
     /* game chat */
     @emoji-size: 24px;
     @line-height: 1.2em;
-
+    
+    @chat-bg-color: rgba(0,0,0,0.6);
+    @odd-bg-color: rgba(0,0,0,0.4);
+    
+    #gameChatContainer {
+        background-color: @chat-bg-color;
+        
+        .gcList > li:nth-child(2n) {
+            background-color: @odd-bg-color;
+        }
+    }
+    
     #gcMessageContainer {
         .amqEmoji,
         .emoji {
