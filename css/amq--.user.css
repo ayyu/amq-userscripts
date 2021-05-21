@@ -1,12 +1,12 @@
 /* ==UserStyle==
 @name           AMQ--
 @namespace      github.com/openstyles/stylus
-@version        1.0.0
+@version        1.0.1
 @description    Stripped down AMQ without avatars or any bullshit. Fixes chat emoji sizes and reduces glow effects. Also allows for custom backgrounds.
 @author         ayyu
 @preprocessor   less
-@var color  background-color "Background color" #111
-@var text   background-image "Background image" "Paste your image URL here"
+@var color  bg-color "Background color" #111
+@var text   bg-image "Background image" "URL in quotes"
 ==/UserStyle== */
 @-moz-document domain("animemusicquiz.com") {
 
@@ -35,11 +35,11 @@
     #startPage,
     #awMainView,
     #loadingScreen::before {
-        background: @background-color url("@background-image") no-repeat center center fixed;
+        background: @bg-color url("@{bg-image}") no-repeat center center fixed;
     }
 
     #loadingScreen {
-        background: @background-color;
+        background: @bg-color;
 
         &::before {
             content: "";
