@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           AMQ--
 @namespace      github.com/openstyles/stylus
-@version        1.0.1
+@version        1.0.2
 @description    Stripped down AMQ without avatars or any bullshit. Fixes chat emoji sizes and reduces glow effects. Also allows for custom backgrounds.
 @author         ayyu
 @preprocessor   less
@@ -74,12 +74,11 @@
 
     .lobbyAvatarImgContainer {
         box-shadow: rgb(0, 0, 0) 0px 0px 10px 2px !important;
-    }
 
-    .lbReady .lobbyAvatarImgContainer {
-        background: @ready-color;
+        .lbReady & {
+            background: @ready-color;
+        }
     }
-
 
     /* answer shit */
     .qpAvatarImage[srcset*="Chika"],
@@ -94,19 +93,30 @@
     .qpAvatarContainer {
 
         .qpAvatarImageContainer {
-            visibility: hidden;
-            height: 25%;
-
+            box-shadow: none;
+            background: none !important;
+            height: 30%;
+            
+            .qpLiftContainer {
+                right: auto;
+                top: 40px;
+                
+                .qpLife {
+                    height: 15%;
+                    display: inline-block;
+                }
+                
+                .qpOverlay {
+                    box-shadow: none;
+                }
+            }
+            
             .qpAvatarImage,
             .lobbyAvatarImg,
             .particleEmiter {
                 display: none;
             }
         }
-    }
-
-    .qpAvatarImageContainer {
-        background: none !important;
     }
 
     .qpAvatarAnswerContainer {
