@@ -1,0 +1,157 @@
+/* ==UserStyle==
+@name           AMQ--
+@namespace      github.com/openstyles/stylus
+@version        1.0.0
+@description    Stripped down AMQ without avatars or any bullshit. Fixes chat emoji sizes and reduces glow effects. Also allows for custom backgrounds.
+@author         ayyu
+@preprocessor   less
+@var color  background-color "Background color" #111
+@var text   background-image "Background image" "Paste your image URL here"
+==/UserStyle== */
+@-moz-document domain("animemusicquiz.com") {
+
+    @right-color: #b6ff00;
+    @wrong-color: #fb1212;
+    @gold-color: #ffd700;
+    @focus-color: #228dff;
+    @reward-color: #4497ea;
+    @ready-color: #006ab7;
+    
+    .small-text-shadow(@color) {
+        text-shadow: 0 0 2px @color;
+    }
+
+    .outline-shadow(@size, @color) {
+        outline: @size solid @color;
+        box-shadow: none;
+    }
+
+    #loadingScreen {
+        z-index: 1100;
+    }
+
+    #gameChatPage > .col-xs-9,
+    #gameContainer,
+    #startPage,
+    #awMainView,
+    #loadingScreen::before {
+        background: @background-color url("@background-image") no-repeat center center fixed;
+    }
+
+    #loadingScreen {
+        background: @background-color;
+
+        &::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: .5;
+        }
+    }
+
+    #qpAnswerInputContainer.focused,
+    #qpReturnLobbyVoteContainer {
+        .outline-shadow(1px, @focus-color);
+    }
+
+    #qpVoteSkipGlowContainer {
+        box-shadow: none;
+    }
+
+    /* room browser */
+    .rbrRoomImageContainer {
+        display: none;
+    }
+
+    /* lobby */
+    .lobbyAvatarImg {
+        display: none;
+    }
+
+    .lobbyAvatarImgContainer {
+        box-shadow: rgb(0, 0, 0) 0px 0px 10px 2px !important;
+    }
+
+    .lbReady .lobbyAvatarImgContainer {
+        background: @ready-color;
+    }
+
+
+    /* answer shit */
+    .qpAvatarImage[srcset*="Chika"],
+    .qpAvatarImage[srcset*="Akira"],
+    .qpAvatarImage[srcset*="Alisa"],
+    .qpAvatarImage[srcset*="Marine"],
+    .qpAvatarImage[srcset*="Mizuki"],
+    .qpAvatarImage[srcset*="Riku"] {
+        display: none;
+    }
+
+    .qpAvatarContainer {
+
+        .qpAvatarImageContainer {
+            visibility: hidden;
+            height: 25%;
+
+            .qpAvatarImage,
+            .lobbyAvatarImg,
+            .particleEmiter {
+                display: none;
+            }
+        }
+    }
+
+    .qpAvatarImageContainer {
+        background: none !important;
+    }
+
+    .qpAvatarAnswerContainer {
+        top: 0;
+        min-width: 100%;
+    }
+
+    .qpAvatarAnswerText {
+
+        &.rightAnswer,
+        &.wrongAnswer,
+        &.goldGlow {
+            color: white;
+        }
+
+        &.rightAnswer {
+            .small-text-shadow(@right-color);
+        }
+
+        &.wrongAnswer {
+            .small-text-shadow(@wrong-color);
+        }
+
+        &.goldGlow {
+            .small-text-shadow(@gold-color);
+        }
+    }
+
+    /* game chat */
+    @emoji-size: 24px;
+    @line-height: 1.2em;
+
+    #gameChatContainer {
+        .amqEmoji,
+        .emoji {
+            max-width: @emoji-size;
+            max-height: @emoji-size;
+            margin: calc(@line-height - @emoji-size) 0;
+            vertical-align: middle;
+        }
+    }
+
+
+    /* rewards */
+    #xpBarAnimationContainer {
+        .outline-shadow(3px, @reward-color);
+    }
+}
