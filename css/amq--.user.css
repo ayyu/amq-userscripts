@@ -43,6 +43,7 @@
     #awMainView,
     #loadingScreen::before {
         background: @bg-color url("@{bg-image}") no-repeat center center fixed;
+        background-size: cover;
     }
 
     #loadingScreen {
