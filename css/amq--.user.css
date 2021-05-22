@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           AMQ--
 @namespace      github.com/openstyles/stylus
-@version        1.0.3
+@version        1.0.2
 @description    Stripped down AMQ without avatars or any bullshit. Fixes chat emoji sizes and reduces glow effects. Also allows for custom backgrounds.
 @author         ayyu
 @preprocessor   less
@@ -13,6 +13,9 @@
     @right-color: #b6ff00;
     @wrong-color: #fb1212;
     @gold-color: #ffd700;
+    @bronze-color: #c0c0c0;
+    @silver-color: #cd7f32;
+    
     @focus-color: #228dff;
     @reward-color: #4497ea;
     @ready-color: #006ab7;
@@ -89,15 +92,6 @@
     }
 
     /* answer shit */
-    .qpAvatarImage[srcset*="Chika"],
-    .qpAvatarImage[srcset*="Akira"],
-    .qpAvatarImage[srcset*="Alisa"],
-    .qpAvatarImage[srcset*="Marine"],
-    .qpAvatarImage[srcset*="Mizuki"],
-    .qpAvatarImage[srcset*="Riku"] {
-        display: none;
-    }
-
     .qpAvatarContainer {
 
         .qpAvatarImageContainer {
@@ -136,21 +130,30 @@
 
         &.rightAnswer,
         &.wrongAnswer,
-        &.goldGlow {
+        &.goldGlow,
+        &.silverGlow,
+        &.bronzeGlow
+        {
             color: white;
         }
 
         &.rightAnswer {
             .small-text-shadow(@right-color);
         }
-
         &.wrongAnswer {
             .small-text-shadow(@wrong-color);
         }
-
+        
         &.goldGlow {
             .small-text-shadow(@gold-color);
         }
+        &.silverGlow {
+            .small-text-shadow(@silver-color);
+        }
+        &.bronzeGlow {
+            .small-text-shadow(@bronze-color);
+        }
+        
     }
 
     /* game chat */
