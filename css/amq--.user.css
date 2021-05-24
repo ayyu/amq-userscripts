@@ -10,7 +10,7 @@
 ==/UserStyle== */
 @-moz-document domain("animemusicquiz.com") {
 
-    @right-color: #b6ff00;
+    @correct-color: #b6ff00;
     @wrong-color: #fb1212;
     @gold-color: #ffd700;
     @bronze-color: #c0c0c0;
@@ -92,6 +92,11 @@
         }
     }
 
+    /* anime */
+    #qpStandingCorrectCount {
+        .small-text-shadow(@correct-color);
+    }
+
     /* answer shit */
     .qpAvatarContainer {
 
@@ -139,7 +144,7 @@
         }
 
         &.rightAnswer {
-            .small-text-shadow(@right-color);
+            .small-text-shadow(@correct-color);
         }
         &.wrongAnswer {
             .small-text-shadow(@wrong-color);
