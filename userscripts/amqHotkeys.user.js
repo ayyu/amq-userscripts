@@ -1,16 +1,17 @@
 // ==UserScript==
 // @name         AMQ Hotkey Functions
 // @namespace    https://github.com/ayyu/amq-scripts
-// @version      0.3
+// @version      0.4
 // @description  Streamlined version of nyamu's hotkey script that conflicts less with normal usage.
 // @description  Customize hotkeys by editing the keyBinds object.
 // @description  Escape: remove zombie tooltips
 // @description  Tab: move cursor focus to answer box
 // @description  Shift + Tab: move cursor focus to chat box
 // @description  Ctrl + Enter: skip
-// @description  Ctrl + 1: start game if all players are ready
-// @description  Ctrl + 2: start vote for returning to lobby
-// @description  Ctrl + 3: pause quiz
+// @description  Alt + 1: start game if all players are ready
+// @description  Alt + 2: start vote for returning to lobby
+// @description  Alt + 3: pause quiz
+// @description  Alt + 4: toggle team chat
 // @author       ayyu
 // @match        https://animemusicquiz.com/*
 // @grant        none
@@ -51,6 +52,10 @@ var keyBinds = {
 	"focusChat": {
 		"mod": ["shift"],
 		"key": "Tab"
+	},
+	"toggleTeamChat": {
+		"mod": ["alt"],
+		"key": "4"
 	}
 };
 
@@ -121,6 +126,11 @@ keyBinds.focusAnswer.callback = function() {
 
 keyBinds.focusChat.callback = function() {
 	quiz.setInputInFocus(false);
+	$("#gcInput").focus();
+}
+
+keyBinds.toggleTeamChat.callback = function() {
+	$("#gcTeamChatSwitch").click();
 	$("#gcInput").focus();
 }
 
