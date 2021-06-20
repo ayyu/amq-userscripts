@@ -34,7 +34,7 @@ function answerHandler(event) {
 			);
 		} else if (altcaseSwitch) {
 			quiz.answerInput.setNewAnswer(
-				answer.replace(/[a-z]/gi,c=>c[`to${(s=!s)?'Upp':'Low'}erCase`]())
+				answer.replace(/[a-z]/gi,c=>c[`to${(answer=!answer)?'Upp':'Low'}erCase`]())
 			);
 		}
 	}
