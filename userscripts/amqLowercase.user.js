@@ -72,6 +72,7 @@ function setup() {
 	let oldWidth = $("#qpOptionContainer").width();
 	$("#qpOptionContainer").width(oldWidth + 70);
 	$("#qpOptionContainer > div").append(lowercaseButton);
+	$("#qpOptionContainer > div").append(altcaseButton);
 
 	// add Enter key listener for copypasta
 	new Listener("quiz ready", (data) => {
