@@ -33,7 +33,7 @@ function setup() {
 	lowercaseButton = $(`<div id="qpLowercaseButton" class="clickAble qpOption"><i aria-hidden="true" class="fa fa-wheelchair-alt qpMenuItem"></i></div>`);
 	lowercaseButton.popover({
 		placement: "bottom",
-		content: "Toggle co-op copy paste to chat",
+		content: "Toggle automatic lowercase",
 		trigger: "hover"
 	});
 	lowercaseButton.click(function () {
