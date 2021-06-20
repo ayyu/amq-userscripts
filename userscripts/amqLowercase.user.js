@@ -17,6 +17,9 @@ if (document.getElementById('startPage')) {
 let lowercaseButton;
 let lowercaseSwitch = false;
 
+let altcaseButton;
+let altcaseSwitch = false;
+
 function quizJoinHandler(data) {
 	quiz.answerInput.$input.off("keypress", answerHandler)
 	.on("keypress", answerHandler);
@@ -24,9 +27,18 @@ function quizJoinHandler(data) {
 
 function answerHandler(event) {
 	var answer = quiz.answerInput.$input.val();
-	if (event.which === 13 && lowercaseSwitch) {
-		quiz.answerInput.setNewAnswer(answer.toLowerCase());
+	if (event.which === 13) {
+		if (lowercaseSwitch) {
+			quiz.answerInput.setNewAnswer(
+				answer.toLowerCase()
+			);
+		} else if (altcaseSwitch) {
+			quiz.answerInput.setNewAnswer(
+				answer.replace(/[a-z]/gi,c=>c[`to${(s=!s)?'Upp':'Low'}erCase`]())
+			);
+		}
 	}
+
 }
 
 function setup() {
@@ -43,9 +55,22 @@ function setup() {
 		$(`#qpLowercaseButton i`).toggleClass('fa-inverse', lowercaseSwitch);
 	});
 
+	altcaseButton = $(`<div id="qpAltcaseButton" class="clickAble qpOption"><i aria-hidden="true" class="fa fa-trash qpMenuItem"></i></div>`);
+	altcaseButton.popover({
+		placement: "bottom",
+		content: "Toggle automatic alternating case",
+		trigger: "hover"
+	});
+	altcaseButton.click(function () {
+		msg = (altcaseSwitch ? "Disabled" : "Enabled") + " auto alternating case.";
+		gameChat.systemMessage(msg);
+		altcaseSwitch = !altcaseSwitch;
+		$(`#qpAltcaseButton i`).toggleClass('fa-inverse', altcaseSwitch);
+	});
+
 	// Adds button to in-game options to enable paster
 	let oldWidth = $("#qpOptionContainer").width();
-	$("#qpOptionContainer").width(oldWidth + 35);
+	$("#qpOptionContainer").width(oldWidth + 70);
 	$("#qpOptionContainer > div").append(lowercaseButton);
 
 	// add Enter key listener for copypasta
@@ -60,7 +85,7 @@ function setup() {
 setup();
 
 AMQ_addStyle(`
-	#qpLowercaseButton {
+	#qpLowercaseButton, #qpAltcaseButton {
 		width: 30px;
 		height: 100%;
 		margin-right: 5px;
