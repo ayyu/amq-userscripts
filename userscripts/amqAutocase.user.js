@@ -18,8 +18,8 @@ if (document.getElementById('startPage')) {
 // at least it's better than having 2 separate buttons
 let button;
 let toggleState = "none";
-let msg;
 // states: none lower alternate
+let msg;
 
 function quizJoinHandler(data) {
 	quiz.answerInput.$input.off("keypress", answerHandler)
@@ -44,22 +44,22 @@ function answerHandler(event) {
 }
 
 function toggle() {
-	button.removeClass(['fa-font', 'fa-wheelchair', 'fa-wheelchair-alt']);
+	$(`#qpCaseButton i`).removeClass("fa-font fa-wheelchair fa-wheelchair-alt");
 	switch (toggleState) {
 		case "none":
 			msg = "Enabled auto lowercase";
 			toggleState = "lower";
-			button.addClass(['fa-wheelchair', 'fa-inverse']);
+			$(`#qpCaseButton i`).addClass("fa-wheelchair fa-inverse");
 			break;
 		case "lower":
 			msg = "Enabled auto alternate case";
 			toggleState = "alternate";
-			button.addClass(['fa-wheelchair-alt', 'fa-inverse']);
+			$(`#qpCaseButton i`).addClass("fa-wheelchair-alt fa-inverse");
 			break;
 		case "alternate":
 			msg = "Disabled auto case";
-			button.addClass('fa-font');
-			button.removeClass('fa-inverse');
+			$(`#qpCaseButton i`).addClass("fa-font");
+			$(`#qpCaseButton i`).removeClass("fa-inverse");
 			toggleState = "none";
 	}
 	gameChat.systemMessage(msg);

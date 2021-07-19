@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Co-op Autopaste
 // @namespace    https://github.com/ayyu/
-// @version      1.8
+// @version      2.0
 // @description  Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.
 // @author       ayyu
 // @match        https://animemusicquiz.com/*
@@ -14,33 +14,27 @@ if (document.getElementById('startPage')) {
 	return;
 }
 
-let minInterval = 200;
-let lastAnswer = "";
-
 let coopButton;
 let coopPaste = false;
 
 let prefix = "[ANSWER] ";
+let re = new RegExp("^" + escapeRegex(prefix));
+let lastAnswer = "";
 
 function escapeRegex(string) {
 	return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
-let re = new RegExp("^" + escapeRegex(prefix));
-
-function quizJoinHandler(data) {
-	if (quiz.gameMode !== "Ranked") {
-		quiz.answerInput.$input.off("keypress", answerHandler)
-		.on("keypress", answerHandler);
-	}
-	else {
-		quiz.answerInput.$input.off("keypress", answerHandler);
-	}
+function ciCompare(a, b) {
+  return a.trim().toUpperCase() == b.trim().toUpperCase();
 }
 
-function answerHandler(event) {
-	var answer = quiz.answerInput.$input.val();
-	if (event.which === 13 && coopPaste && answer != lastAnswer) {
+function answerHandler(answer) {
+	if (quiz.gameMode === "Ranked") {
+		return;
+	}
+
+	if (coopPaste && !ciCompare(answer, lastAnswer)) {
 		msg = prefix + answer;
 		gameChat.$chatInputField.val(msg);
 		gameChat.sendMessage();
@@ -50,14 +44,15 @@ function answerHandler(event) {
 
 function messageHandler(payload) {
 	message = payload.message;
-	if (re.test(message) && coopPaste) {
+	if (coopPaste && re.test(message)) {
 		answer = message.replace(re, '');
-		quiz.answerInput.setNewAnswer(answer);
+		if (!ciCompare(quiz.answerInput.quizAnswerState.submittedAnswer, answer)) {
+			quiz.answerInput.setNewAnswer(answer);
+		}
 	}
 }
 
 function setup() {
-
 	coopButton = $(`<div id="qpCoopButton" class="clickAble qpOption"><i aria-hidden="true" class="fa fa-clipboard qpMenuItem"></i></div>`);
 	coopButton.popover({
 		placement: "bottom",
@@ -76,12 +71,9 @@ function setup() {
 	$("#qpOptionContainer").width(oldWidth + 35);
 	$("#qpOptionContainer > div").append(coopButton);
 
-	// add Enter key listener for copypasta
-	new Listener("quiz ready", (data) => {
-		quizJoinHandler(data);
-	}).bindListener();
-	new Listener("Rejoining Player", (data) => {
-		quizJoinHandler(data);
+	// listener for submission
+	new Listener("quiz answer", (payload) => {
+		answerHandler(payload.answer);
 	}).bindListener();
 
 	// clear upon new song last answer
@@ -99,21 +91,6 @@ function setup() {
 		});
 	}).bindListener();
 }
-
-function debounce(func, wait, immediate) {
-	var timeout;
-	return function() {
-		var context = this, args = arguments;
-		var later = function() {
-			timeout = null;
-			if (!immediate) func.apply(context, args);
-		};
-		var callNow = immediate && !timeout;
-		clearTimeout(timeout);
-		timeout = setTimeout(later, wait);
-		if (callNow) func.apply(context, args);
-	};
-};
 
 setup();
 
