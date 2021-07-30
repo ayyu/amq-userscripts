@@ -10,13 +10,21 @@ EOM
 
 in_dir="source"
 
-while getopts hi: flag
+while [[ $# -gt 0 ]]; 
 do
-	case "${flag}" in
-		h) usage;;
-		i) in_dir=${OPTARG};;
+	flag="$1"
+	case $flag in
+	    -h) usage
+	 	shift;;
+	    -i) in_dir="$2"
+	    shift; shift;;
+	    *)    # unknown option
+	    POSITIONAL+=("$1") # save it in an array for later
+	    shift # past argument
+	    ;;
 	esac
 done
+set -- "${POSITIONAL[@]}" # restore positional parameters
 
 for file in "$in_dir"/*
 do

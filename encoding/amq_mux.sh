@@ -51,7 +51,7 @@ do
 		ffmpeg \
 			-y -i "$in_audio" $ss \
 			$mp3_settings \
-			-f mp3 $out_dir/$filename.$extension
+			-f mp3 "$out_dir/$filename.$extension"
 	else
 		ffmpeg \
 			-y -i "$file" $ss \
@@ -59,6 +59,6 @@ do
 			-shortest -map 0:v -map 1:a \
 			-c:v copy \
 			$opus_settings \
-			-f webm $out_dir/$filename.$extension
+			-f webm "$out_dir/$filename.$extension"
 	fi
 done

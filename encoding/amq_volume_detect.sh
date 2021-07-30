@@ -9,18 +9,26 @@ EOM
 	exit 1
 }
 
-while getopts hi: flag
+while [[ $# -gt 0 ]]; 
 do
-	case "${flag}" in
-		h) usage;;
-		i) file=$(basename ${OPTARG});;
+	flag="$1"
+	case $flag in
+	    -h) usage
+	 	shift;;
+	    -i) file="$2"
+	    shift; shift;;
+	    *)    # unknown option
+	    POSITIONAL+=("$1") # save it in an array for later
+	    shift # past argument
+	    ;;
 	esac
 done
+set -- "${POSITIONAL[@]}" # restore positional parameters
 
 source "${BASH_SOURCE%/*}/amq_settings.sh"
 
 echo "Detecting volume of sample for ${file}..."
-output=$(ffmpeg $@ -vn -af volumedetect -f null /dev/null 2>&1)
+output=$(ffmpeg -i "$file" -vn -af volumedetect -f null /dev/null 2>&1)
 mean_volume=`echo "$output" | awk -F': | dB' '/mean_volume/ {print $2}'`
 max_volume=`echo "$output" | awk -F': | dB' '/max_volume/ {print $2}'`
 diff_mean=$(awk "BEGIN {print ($target_mean)-($mean_volume)}")

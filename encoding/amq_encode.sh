@@ -20,13 +20,13 @@ do
 	case $flag in
 	    -h) usage
 	 	shift;;
-	    -i) file=$2
+	    -i) file="$2"
 	    shift; shift;;
 	    -vf) vf="$2,"
 		shift; shift;;
 		-af) af="-af $2"
 		shift; shift;;
-		-crf) crf=$2
+		-crf) crf="$2"
 		shift; shift;;
 	    *)    # unknown option
 	    POSITIONAL+=("$1") # save it in an array for later
@@ -45,7 +45,7 @@ cpu_settings="-deadline good -cpu-used 1 -row-mt 1 -frame-parallel 0 -tile-colum
 mkdir -p $out_dir
 echo "outputs to $out_dir"
 
-source_height=$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=nw=1:nk=1 $file)
+source_height=$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=nw=1:nk=1 "$file")
 echo "source height is $source_height"
 
 for scale in 480 720
@@ -72,7 +72,7 @@ do
 			$cpu_settings \
 			$af \
 			-vf "${vf}scale=-1:$scale,setsar=1" \
-			-pass 2 -f webm $out_dir/$scale.webm
+			-pass 2 -f webm "$out_dir/$scale.webm"
 	else
 		echo "skipping $scale"
 	fi
@@ -86,4 +86,4 @@ ffmpeg \
 	-vn \
 	$mp3_settings \
 	$af \
-	-f mp3 $out_dir/audio.mp3
+	-f mp3 "$out_dir/audio.mp3"

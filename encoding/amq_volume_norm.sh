@@ -9,17 +9,25 @@ EOM
 	exit 1
 }
 
-while getopts hi: flag
+while [[ $# -gt 0 ]]; 
 do
-	case "${flag}" in
-		h) usage;;
-		i) file=$(basename ${OPTARG});;
+	flag="$1"
+	case $flag in
+	    -h) usage
+	 	shift;;
+	    -i) file="$2"
+	    shift; shift;;
+	    *)    # unknown option
+	    POSITIONAL+=("$1") # save it in an array for later
+	    shift # past argument
+	    ;;
 	esac
 done
+set -- "${POSITIONAL[@]}" # restore positional parameters
 
 source "${BASH_SOURCE%/*}/amq_volume_detect.sh" $@
 
-filename="${file%.*}"
+filename="$(basename ${file%.*})"
 extension="${file##*.}"
 
 source "${BASH_SOURCE%/*}/amq_settings.sh"
@@ -35,7 +43,7 @@ out_dir="norm"
 mkdir -p "$out_dir"
 
 ffmpeg \
-	-y $@ \
+	-y -i "$file" \
 	$meta_settings \
 	$format_settings \
 	-af "volume=${diff_clip}dB" \
