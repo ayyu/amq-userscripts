@@ -37,7 +37,7 @@ var keyBinds = {
 		"mod": ["alt"],
 		"key": "2"
 	},
-  "quizPause": {
+  	"quizPause": {
 		"mod": ["alt"],
 		"key": "3"
 	},
@@ -95,10 +95,10 @@ keyBinds.startLobby.callback = function() {
 }
 
 keyBinds.returnLobby.callback = function() {
-	if (lobby.isHost &&
-		quiz.inQuiz &&
+	if (quiz.inQuiz &&
 		hostModal.gameMode !== 'Ranked') {
 		quiz.startReturnLobbyVote();
+		quiz.returnVoteController.$VOTE_YES_BUTTON.trigger('click');
 	}
 }
 
@@ -112,7 +112,7 @@ keyBinds.quizPause.callback = function() {
 
 keyBinds.voteSkip.callback = function() {
 	if (!quiz.isSpectator) {
-		quiz.skipClicked()
+		quiz.skipClicked();
 	}
 }
 
@@ -130,8 +130,7 @@ keyBinds.focusChat.callback = function() {
 }
 
 keyBinds.toggleTeamChat.callback = function() {
-	$("#gcTeamChatSwitch").click();
-	$("#gcInput").focus();
+	$("#gcTeamChatSwitch").trigger('click');
 }
 
 document.addEventListener('keydown', onKeyDown, false);
