@@ -4,6 +4,7 @@ crf=20
 vf=""
 af=""
 out_dir=source
+skip=""
 
 usage () {
 	cat <<EOM
@@ -28,6 +29,8 @@ do
 		shift; shift;;
 		-crf) crf="$2"
 		shift; shift;;
+		-skip) skip="$skip,$2"
+		shift; shift;;
 	    *)    # unknown option
 	    POSITIONAL+=("$1") # save it in an array for later
 	    shift # past argument
@@ -50,6 +53,10 @@ echo "source height is $source_height"
 
 for scale in 480 720
 do
+	if [[ "$skip" == *"$scale"* ]]; then
+		echo "skipping $scale"
+		continue
+	fi
 	if [[ "$source_height" -ge "$scale" || "$scale" -eq 480 ]]; then
 		echo "encoding $scale"
 		ffmpeg \
@@ -74,16 +81,20 @@ do
 			-vf "${vf}scale=-1:$scale,setsar=1" \
 			-pass 2 -f webm "$out_dir/$scale.webm"
 	else
-		echo "skipping $scale"
+		echo "skipping $scale due to source resolution"
 	fi
 done
 
-echo "encoding mp3"
-ffmpeg \
-	-y -i "$file" \
-	$meta_settings \
-	$@ \
-	-vn \
-	$mp3_settings \
-	$af \
-	-f mp3 "$out_dir/audio.mp3"
+if [[ "$skip" == *"mp3"* ]]; then
+	echo "skipping mp3"
+else
+	echo "encoding mp3"
+	ffmpeg \
+		-y -i "$file" \
+		$meta_settings \
+		$@ \
+		-vn \
+		$mp3_settings \
+		$af \
+		-f mp3 "$out_dir/audio.mp3"
+fi
