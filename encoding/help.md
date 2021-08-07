@@ -78,6 +78,7 @@ amq_volume_auto.sh -i "clean"
 ```
 
 You can now upload the contents of your `norm` folder.
+Yes I am aware that this introduces generation loss but it's minimal at the prescribed bitrate.
 
 ## Tips
 
