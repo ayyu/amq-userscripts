@@ -5,10 +5,13 @@ These scripts expedite 2-pass VP9/Opus encoding for AMQ using `ffmpeg`.
 ## Requirements
 
 - `bash`
-  - if you're on Windows 10, you can use [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
-    - if you're on older Windows versions, it might be time to upgrade
+  - if you're on Windows 10, you can use [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
+  - if you're on older Windows versions, it might be time to upgrade.
+  - OS X/Linux users know what they're doing.
 - `ffmpeg`
   - in bash, do `sudo apt update && sudo apt install ffmpeg`
+- some level of comfort using a terminal
+  - This might be a tall ask.
 
 ## Installing
 
@@ -100,7 +103,7 @@ People will hate on you for using a 320K source for a 320K encode, but the diffe
 
 You can use [Spek](http://spek.cc/) to visualize this.
 
-### fixing 3:2 pulldown, 30 FPS > 24 FPS
+### Fixing 3:2 pulldown, 30 FPS > 24 FPS
 
 If your source file is 29.97 fps and has a duplicated frame once every 6 frames, you can fix it in your encode by adding the following argument to your encode command:
 
