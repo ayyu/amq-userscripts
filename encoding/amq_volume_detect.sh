@@ -34,13 +34,14 @@ max_volume=`echo "$output" | awk -F': | dB' '/max_volume/ {print $2}'`
 diff_mean=$(awk "BEGIN {print ($target_mean)-($mean_volume)}")
 diff_clip=$(awk "BEGIN {
 	new_peak = ($max_volume) + ($diff_mean)
-	if (new_peak > 0)
-		print -($max_volume)
+	if (new_peak > $target_max)
+		print -($max_volume) + ($target_max)
 	else 
 		print $diff_mean
 }")
 echo "mean_volume: $mean_volume"
 echo "max_volume: $max_volume"
 echo "target_mean: $target_mean"
+echo "target_max: $target_max"
 echo "diff_mean: $diff_mean"
 echo "diff_clip: $diff_clip"
