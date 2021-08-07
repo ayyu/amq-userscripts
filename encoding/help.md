@@ -95,6 +95,9 @@ You can of course still use MP3/FLAC for your sources (as long as they are of ac
 Generally, lossy codecs save space by discarding information that's humanly inaudible. The more compression, the lower the cutoff frequency gets.
 MP3 @ 320K CBR usually cuts off at 20-22 kHz, so it's *usually* safe to use it as a source, but anything at lower bitrates gets worse rapidly. YMMV.
 Lossless files do not have this limitation.
+
+People will hate on you for using a 320K source for a 320K encode, but the differences are inaudible to human ears so you can safely dismiss them as mindless Redditors. However, using audio sources with clear degradation in quality (e.g. 128K YouTube rips) is noticeably worse, so avoid this at all costs unless you are encoding an obscure web-only release with no released OSTs.
+
 You can use [Spek](http://spek.cc/) to visualize this.
 
 ### fixing 3:2 pulldown, 30 FPS > 24 FPS
