@@ -51,7 +51,7 @@ echo "outputs to $out_dir"
 source_height=$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=nw=1:nk=1 "$file")
 echo "source height is $source_height"
 
-for scale in 480 720
+for scale in 0 480 720
 do
 	if [[ "$skip" == *"$scale"* ]]; then
 		echo "skipping $scale"
@@ -59,42 +59,39 @@ do
 	fi
 	if [[ "$source_height" -ge "$scale" || "$scale" -eq 480 ]]; then
 		echo "encoding $scale"
-		ffmpeg \
-			-y -i "$file" \
-			$map_settings \
-			$meta_settings \
-			$@ \
-			$video_settings \
-			-an \
-			$cpu_settings \
-			-vf "${vf}scale=-1:$scale,setsar=1" \
-			-pass 1 -f null /dev/null && \
-		ffmpeg \
-			-y -i "$file" \
-			$map_settings \
-			$meta_settings \
-			$@ \
-			$video_settings \
-			$opus_settings \
-			$cpu_settings \
-			$af \
-			-vf "${vf}scale=-1:$scale,setsar=1" \
-			-pass 2 -f webm "$out_dir/$scale.webm"
+		if [[ "$scale" -q 0 ]]; then # MP3
+			ffmpeg \
+				-y -i "$file" \
+				$meta_settings \
+				$@ \
+				-vn \
+				$mp3_settings \
+				$af \
+				-f mp3 "$out_dir/$scale.mp3"
+		else
+			ffmpeg \
+				-y -i "$file" \
+				$map_settings \
+				$meta_settings \
+				$@ \
+				$video_settings \
+				-an \
+				$cpu_settings \
+				-vf "${vf}scale=-1:$scale,setsar=1" \
+				-pass 1 -f null /dev/null && \
+			ffmpeg \
+				-y -i "$file" \
+				$map_settings \
+				$meta_settings \
+				$@ \
+				$video_settings \
+				$opus_settings \
+				$cpu_settings \
+				$af \
+				-vf "${vf}scale=-1:$scale,setsar=1" \
+				-pass 2 -f webm "$out_dir/$scale.webm"
+			fi
 	else
 		echo "skipping $scale due to source resolution"
 	fi
 done
-
-if [[ "$skip" == *"mp3"* ]]; then
-	echo "skipping mp3"
-else
-	echo "encoding mp3"
-	ffmpeg \
-		-y -i "$file" \
-		$meta_settings \
-		$@ \
-		-vn \
-		$mp3_settings \
-		$af \
-		-f mp3 "$out_dir/audio.mp3"
-fi
