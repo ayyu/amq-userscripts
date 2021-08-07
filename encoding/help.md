@@ -5,8 +5,8 @@ These scripts expedite 2-pass VP9/Opus encoding for AMQ using `ffmpeg`.
 ## Requirements
 
 - `bash`
-- if you're on Windows 10, you can use [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
-  - if you're on older Windows versions, it might be time to upgrade
+  - if you're on Windows 10, you can use [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
+    - if you're on older Windows versions, it might be time to upgrade
 - `ffmpeg`
   - in bash, do `sudo apt update && sudo apt install ffmpeg`
 
@@ -27,7 +27,9 @@ Make sure all the scripts are in the same folder as several of them depend on ea
 
 The `amq_encode.sh` mostly gets called the same way that you would call an ffmpeg command, and will pass parameters as needed.
 This is usually the first thing you will use.
+
 First, pick your start and end timestamps from your source video, ideally to the millisecond level. You can use a player capable of frame advancing and millisecond display to do this. [mpv](https://mpv.io/) works quite well. You can also use an audio editor to do this.
+
 Pass them to `amq_encode.sh` with the `-ss` and `-to` flags, respectively.
 
 ```bash
@@ -36,7 +38,7 @@ amq_encode.sh -i "[LowPower-Raws] Tokyo 7th Sisters (Bluray-1080p).mkv" -ss 58:0
 
 Once this is done, your (unclean) outputs will be in the `source` folder.
 
-I would recommend saving your command in a `.sh` file for future reference:
+I would recommend saving your command in a `.sh` file for future reference, perhaps making it a bit more readable:
 
 ```bash
 amq_encode.sh \
@@ -110,3 +112,5 @@ If you require deinterlacing as well, do this instead:
 ```
 
 See this [Wikipedia entry](https://en.wikipedia.org/wiki/Three-two_pull_down) if you're a nerd.
+
+I will cover more corner cases and corrections as they come up or I remember them, which won't be very often due to my feeble arthritic brain.
