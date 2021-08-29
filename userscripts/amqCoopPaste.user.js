@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Co-op Autopaste
 // @namespace    https://github.com/ayyu/
-// @version      2.0
+// @version      2.1
 // @description  Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.
 // @author       ayyu
 // @match        https://animemusicquiz.com/*
@@ -10,16 +10,20 @@
 // @downloadURL  https://raw.githubusercontent.com/ayyu/amq-scripts/master/userscripts/amqCoopPaste.user.js
 // ==/UserScript==
 
-if (document.getElementById('startPage')) {
+if (document.getElementById("startPage")) {
 	return;
 }
 
 let coopButton;
 let coopPaste = false;
 
-let prefix = "[ANSWER] ";
-let re = new RegExp("^" + escapeRegex(prefix));
+let prefix = "[cp]";
+let re = new RegExp(escapeRegex(prefix));
 let lastAnswer = "";
+
+function decorate(string) {
+  return prefix+string;
+}
 
 function escapeRegex(string) {
 	return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
@@ -35,17 +39,15 @@ function answerHandler(answer) {
 	}
 
 	if (coopPaste && !ciCompare(answer, lastAnswer)) {
-		msg = prefix + answer;
-		gameChat.$chatInputField.val(msg);
+		gameChat.$chatInputField.val(decorate(answer));
 		gameChat.sendMessage();
 		lastAnswer = answer;
 	}
 }
 
 function messageHandler(payload) {
-	message = payload.message;
-	if (coopPaste && re.test(message)) {
-		answer = message.replace(re, '');
+  if (coopPaste && payload.sender != selfName && re.test(payload.message)) {
+		answer = payload.message.replace(re, '');
 		if (!ciCompare(quiz.answerInput.quizAnswerState.submittedAnswer, answer)) {
 			quiz.answerInput.setNewAnswer(answer);
 		}
@@ -63,13 +65,13 @@ function setup() {
 		msg = (coopPaste ? "Disabled" : "Enabled") + " co-op paste to chat.";
 		gameChat.systemMessage(msg);
 		coopPaste = !coopPaste;
-		$(`#qpCoopButton i`).toggleClass('fa-inverse', coopPaste);
+		$(`#qpCoopButton i`).toggleClass("fa-inverse", coopPaste);
 	});
 
 	// Adds button to in-game options to enable paster
-	let oldWidth = $("#qpOptionContainer").width();
-	$("#qpOptionContainer").width(oldWidth + 35);
-	$("#qpOptionContainer > div").append(coopButton);
+	let oldWidth = $(`#qpOptionContainer`).width();
+	$(`#qpOptionContainer`).width(oldWidth + 35);
+	$(`#qpOptionContainer > div`).append(coopButton);
 
 	// listener for submission
 	new Listener("quiz answer", (payload) => {
@@ -82,7 +84,7 @@ function setup() {
 	}).bindListener();
 
 	// enter answers that are pasted
-	new Listener("Game Chat Message", (payload) => {
+	new Listener("game chat message", (payload) => {
 		messageHandler(payload);
 	}).bindListener();
 	new Listener("game chat update", (payload) => {
@@ -94,10 +96,8 @@ function setup() {
 
 setup();
 
-AMQ_addStyle(`
-	#qpCoopButton {
-		width: 30px;
-		height: 100%;
-		margin-right: 5px;
-	}
-`);
+AMQ_addStyle(`#qpCoopButton {
+	width: 30px;
+  height: 100%;
+  margin-right: 5px;
+}`);
