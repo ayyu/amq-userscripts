@@ -18,8 +18,10 @@ let coopButton;
 let coopPaste = false;
 
 let prefix = "[cp]";
-let re = new RegExp(escapeRegex(prefix));
+let re = new RegExp("^"+escapeRegex(prefix));
 let lastAnswer = "";
+
+let pasted = false;
 
 function decorate(string) {
   return prefix+string;
@@ -30,6 +32,7 @@ function escapeRegex(string) {
 }
 
 function ciCompare(a, b) {
+	if (typeof a != "string" || typeof b != "string") return false;
   return a.trim().toUpperCase() == b.trim().toUpperCase();
 }
 
@@ -37,11 +40,14 @@ function answerHandler(answer) {
 	if (quiz.gameMode === "Ranked") {
 		return;
 	}
-
-	if (coopPaste && !ciCompare(answer, lastAnswer)) {
+	
+	if (coopPaste && !ciCompare(answer, lastAnswer) && !pasted) {
 		gameChat.$chatInputField.val(decorate(answer));
 		gameChat.sendMessage();
 		lastAnswer = answer;
+	}
+	if (pasted) {
+		pasted = false;
 	}
 }
 
@@ -49,6 +55,7 @@ function messageHandler(payload) {
   if (coopPaste && payload.sender != selfName && re.test(payload.message)) {
 		answer = payload.message.replace(re, '');
 		if (!ciCompare(quiz.answerInput.quizAnswerState.submittedAnswer, answer)) {
+			pasted = true;
 			quiz.answerInput.setNewAnswer(answer);
 		}
 	}
