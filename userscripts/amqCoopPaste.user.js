@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Co-op Autopaste
 // @namespace    https://github.com/ayyu/
-// @version      2.1
+// @version      2.2
 // @description  Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.
 // @author       ayyu
 // @match        https://animemusicquiz.com/*
@@ -13,6 +13,14 @@
 if (document.getElementById("startPage")) {
 	return;
 }
+
+// Wait until the LOADING... screen is hidden and load script
+let loadInterval = setInterval(() => {
+	if (document.getElementById("loadingScreen").classList.contains("hidden")) {
+		setup();
+		clearInterval(loadInterval);
+	}
+}, 500);
 
 let coopButton;
 let coopPaste = false;
@@ -99,12 +107,19 @@ function setup() {
 			messageHandler(message);
 		});
 	}).bindListener();
+
+	AMQ_addScriptData({
+		name: "Co-op Autopaste",
+		author: "ayyu",
+		description: `
+			<p>Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.</p>
+			<p>Adds toggleable button in-game <i aria-hidden="true" class="fa fa-clipboard"></i></p>
+		`
+	});
+
+	AMQ_addStyle(`#qpCoopButton {
+		width: 30px;
+		height: 100%;
+		margin-right: 5px;
+	}`);
 }
-
-setup();
-
-AMQ_addStyle(`#qpCoopButton {
-	width: 30px;
-  height: 100%;
-  margin-right: 5px;
-}`);

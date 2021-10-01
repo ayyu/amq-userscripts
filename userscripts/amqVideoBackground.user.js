@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Video Background script
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @description  Simpler video background script, use with anything you can embed in a <video> tag
 // @author       ayyu
 // @match        https://animemusicquiz.com/*

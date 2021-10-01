@@ -1,17 +1,19 @@
 // ==UserScript==
 // @name         AMQ Hotkey Functions
 // @namespace    https://github.com/ayyu/amq-scripts
-// @version      0.4
-// @description  Streamlined version of nyamu's hotkey script that conflicts less with normal usage.
+// @version      1.0
+// @description  Streamlined version inspired by nyamu's hotkey script that conflicts less with normal browser usage.
 // @description  Customize hotkeys by editing the keyBinds object.
-// @description  Escape: remove zombie tooltips
+// @description  Escape: remove ghost tooltips
 // @description  Tab: move cursor focus to answer box
 // @description  Shift + Tab: move cursor focus to chat box
 // @description  Ctrl + Enter: skip
-// @description  Alt + 1: start game if all players are ready
-// @description  Alt + 2: start vote for returning to lobby
-// @description  Alt + 3: pause quiz
-// @description  Alt + 4: toggle team chat
+// @description  Alt + Up: start game if all players are ready
+// @description  Alt + Down: start vote for returning to lobby, or add your vote to return
+// @description  Alt + Left: switch to player
+// @description  Alt + Right: switch to spectator
+// @description  Alt + `: toggle team chat
+// @description  Alt + 1: pause quiz
 // @author       ayyu
 // @match        https://animemusicquiz.com/*
 // @grant        none
@@ -24,69 +26,99 @@ if (document.getElementById('startPage')) {
 	return;
 }
 
-var keyBinds = {
-	"clearTooltips": {
+// set your keybinds here
+var keybinds = [
+	{
 		"mod": [],
-		"key": "Escape"
+		"key": "Escape",
+		"callback": clearTooltips,
+		"description": "remove ghost tooltips"
 	},
-	"startLobby": {
+	{
 		"mod": ["alt"],
-		"key": "1"
+		"key": "ArrowUp",
+		"callback": startLobby,
+		"description": "start game if all players are ready"
 	},
-	"returnLobby": {
+	{
 		"mod": ["alt"],
-		"key": "2"
+		"key": "ArrowDown",
+		"callback": returnLobby,
+		"description": "start vote for returning to lobby, or add your vote to return"
 	},
-  	"quizPause": {
+	{
 		"mod": ["alt"],
-		"key": "3"
+		"key": "ArrowLeft",
+		"callback": joinLobby,
+		"description": "switch to player"
 	},
-	"voteSkip": {
+	{
+		"mod": ["alt"],
+		"key": "ArrowRight",
+		"callback": joinSpec,
+		"description": "switch to spectator"
+	},
+	{
+		"mod": ["alt"],
+		"key": "`",
+		"callback": toggleTeamChat,
+		"description": "toggle team chat"
+	},
+	{
+		"mod": ["alt"],
+		"key": "1",
+		"callback": pauseQuiz,
+		"description": "toggle team chat"
+	},
+	{
 		"mod": ["ctrl"],
-		"key": "Enter"
+		"key": "Enter",
+		"callback": voteSkip,
+		"description": "vote to skip current song"
 	},
-	"focusAnswer": {
+	{
 		"mod": [],
-		"key": "Tab"
+		"key": "Tab",
+		"callback": focusAnswer,
+		"description": "focus cursor on answer box"
 	},
-	"focusChat": {
+	{
 		"mod": ["shift"],
-		"key": "Tab"
-	},
-	"toggleTeamChat": {
-		"mod": ["alt"],
-		"key": "4"
+		"key": "Tab",
+		"callback": focusChat,
+		"description": "focus cursor on chat"
 	}
-};
+];
 
+// Wait until the LOADING... screen is hidden and load script
+let loadInterval = setInterval(() => {
+	if (document.getElementById("loadingScreen").classList.contains("hidden")) {
+			setup();
+			clearInterval(loadInterval);
+	}
+}, 500);
+
+// handler for keypresses
 function onKeyDown(event) {
-	for (const command in keyBinds) {
-	var currentCommand = keyBinds[command];
-		if (event.key != currentCommand["key"]) {
-			continue;
+	keybinds.forEach(command => {
+		if (event.key == command.key && command.mod.reduce((prev, curr) => {
+			modProp = curr + "Key";
+			return prev && (modProp in event) && event[modProp];
+		}, true)) {
+			event.preventDefault();
+			event.stopPropagation();
+			command.callback();
 		}
-	var matchesMods = true;
-	for (const mod in currentCommand["mod"]) {
-		modProp = currentCommand["mod"] + "Key";
-		if (!(modProp in event) || !event[modProp]) {
-			matchesMods = false;
-			break;
-		}
-	}
-	if (!matchesMods) {
-		continue;
-	}
-	event.preventDefault();
-	event.stopPropagation();
-		keyBinds[command].callback();
-	}
+	});
 }
 
-keyBinds.clearTooltips.callback = function() {
+// BEGIN callbacks for hotkeys
+
+function clearTooltips() {
 	$("[id^=tooltip]").remove(); $("[id^=popover]").remove();
 }
 
-keyBinds.startLobby.callback = function() {
+function startLobby() {
 	if (lobby.isHost &&
 		lobby.numberOfPlayers > 0 &&
 		lobby.numberOfPlayers == lobby.numberOfPlayersReady) {
@@ -94,15 +126,18 @@ keyBinds.startLobby.callback = function() {
 	}
 }
 
-keyBinds.returnLobby.callback = function() {
+function returnLobby() {
 	if (quiz.inQuiz &&
 		hostModal.gameMode !== 'Ranked') {
-		quiz.startReturnLobbyVote();
-		quiz.returnVoteController.$VOTE_YES_BUTTON.trigger('click');
+			if (lobby.isHost) {
+				quiz.startReturnLobbyVote();
+			} else {
+				quiz.returnVoteController.$VOTE_YES_BUTTON.trigger('click');
+			}
 	}
 }
 
-keyBinds.quizPause.callback = function() {
+function pauseQuiz() {
 	if (lobby.isHost &&
 		quiz.inQuiz &&
 		hostModal.gameMode !== 'Ranked') {
@@ -110,13 +145,13 @@ keyBinds.quizPause.callback = function() {
 	}
 }
 
-keyBinds.voteSkip.callback = function() {
+function voteSkip() {
 	if (!quiz.isSpectator) {
 		quiz.skipClicked();
 	}
 }
 
-keyBinds.focusAnswer.callback = function() {
+function focusAnswer() {
 	if (!quiz.isSpectator) {
 		$("#gcInput").blur();
 		quiz.setInputInFocus(true);
@@ -124,30 +159,53 @@ keyBinds.focusAnswer.callback = function() {
 	}
 }
 
-keyBinds.focusChat.callback = function() {
+function focusChat() {
 	quiz.setInputInFocus(false);
 	$("#gcInput").focus();
 }
 
-keyBinds.toggleTeamChat.callback = function() {
+function toggleTeamChat() {
 	$("#gcTeamChatSwitch").trigger('click');
 }
 
-document.addEventListener('keydown', onKeyDown, false);
+function joinLobby() {
+	if(lobby.isSpectator) {
+		lobby.fireMainButtonEvent();
+	}
+}
 
-AMQ_addScriptData({
-	name: "Hotkey Functions",
-	author: "ayyu",
-	description: `
-		<p>Streamlined version of nyamu's hotkey script that conflicts less with normal usage.
-		Customize hotkeys by editing the keyBinds object.</p>
-		<ul>
-			<li><kbd>Escape</kbd>: remove zombie tooltips</li>
-			<li><kbd>Tab</kbd>: move cursor focus to answer box</li>
-			<li><kbd>Shift</kbd> + <kbd>Tab</kbd>: move cursor focus to chat box</li>
-			<li><kbd>Ctrl</kbd> + <kbd>Enter</kbd>: vote skip</li>
-			<li><kbd>Ctrl</kbd> + <kbd>1</kbd>: start game if all players are ready</li>
-			<li><kbd>Ctrl</kbd> + <kbd>2</kbd>: start vote for returning to lobby</li>
-		</ul>
-	`
-});
+function joinSpec() {
+	if(!lobby.isSpectator) {
+		lobby.changeToSpectator(selfName);
+	}
+}
+
+// END callbacks for hotkeys
+
+// pretty printing of hotkeys for script data
+function printKeybind(keybind) {
+	const modString = keybind.mod.reduce((prev, curr) => {
+		return prev + `<kbd>${curr}</kbd> + `;
+	}, "");
+	const keyString = `<kbd>${keybind.key}</kbd>`;
+	return `${modString}${keyString}: ${keybind.description}`;
+}
+
+function setup() {
+	document.addEventListener('keydown', onKeyDown, false);
+	const keybindString = keybinds.map(printKeybind).reduce((prev, curr) => {
+		return prev + `<li>${curr}</li>`;
+	}, "");
+	AMQ_addScriptData({
+		name: "Hotkey Functions",
+		author: "ayyu",
+		description: `
+			<p>Streamlined version inspired by nyamu's hotkey script that conflicts less with normal browser usage.
+			Customize hotkeys by editing the keyBinds object in the script.</p>
+			<p>Current keybinds:</p>
+			<ul>
+				${keybindString}
+			</ul>
+		`
+	});
+}
