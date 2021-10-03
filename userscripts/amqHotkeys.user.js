@@ -29,6 +29,12 @@ if (document.getElementById('startPage')) {
 // set your keybinds here
 var keybinds = [
 	{
+		"mod": ["alt"],
+		"key": "Backspace",
+		"callback": pauseQuiz,
+		"description": "pause quiz"
+	},
+	{
 		"mod": [],
 		"key": "Escape",
 		"callback": clearTooltips,
@@ -63,12 +69,6 @@ var keybinds = [
 		"key": "`",
 		"callback": toggleTeamChat,
 		"description": "toggle team chat"
-	},
-	{
-		"mod": ["alt"],
-		"key": "Back",
-		"callback": pauseQuiz,
-		"description": "pause quiz"
 	},
 	{
 		"mod": ["ctrl"],
