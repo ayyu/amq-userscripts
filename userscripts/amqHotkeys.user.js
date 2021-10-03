@@ -66,9 +66,9 @@ var keybinds = [
 	},
 	{
 		"mod": ["alt"],
-		"key": "1",
+		"key": "Back",
 		"callback": pauseQuiz,
-		"description": "toggle team chat"
+		"description": "pause quiz"
 	},
 	{
 		"mod": ["ctrl"],
@@ -87,6 +87,12 @@ var keybinds = [
 		"key": "Tab",
 		"callback": focusChat,
 		"description": "focus cursor on chat"
+	},
+	{
+		"mod": ["alt", "shift"],
+		"key": "Enter",
+		"callback": copyPasta,
+		"description": "copy paste latest message in chat"
 	}
 ];
 
@@ -178,6 +184,11 @@ function joinSpec() {
 	if(!lobby.isSpectator) {
 		lobby.changeToSpectator(selfName);
 	}
+}
+
+function copyPasta() {
+	gameChat.$chatInputField.val($(`#gcMessageContainer .gcMessage`).last().text());
+	gameChat.sendMessage();
 }
 
 // END callbacks for hotkeys
