@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Hotkey Functions
 // @namespace    https://github.com/ayyu/amq-scripts
-// @version      1.0
+// @version      1.1
 // @description  Streamlined version inspired by nyamu's hotkey script that conflicts less with normal browser usage.
 // @description  Customize hotkeys by editing the keyBinds object.
 // @description  Escape: remove ghost tooltips
@@ -136,16 +136,18 @@ function returnLobby() {
 	if (quiz.inQuiz &&
 		hostModal.gameMode !== 'Ranked') {
 			if (lobby.isHost) {
-				quiz.startReturnLobbyVote();
+				socket.sendCommand({
+					type: "quiz",
+					command: "start return lobby vote",
+				});
 			} else {
-				quiz.returnVoteController.$VOTE_YES_BUTTON.trigger('click');
+				quiz.returnVoteController.vote(true);
 			}
 	}
 }
 
 function pauseQuiz() {
-	if (lobby.isHost &&
-		quiz.inQuiz &&
+	if (quiz.inQuiz &&
 		hostModal.gameMode !== 'Ranked') {
 		quiz.pauseButton.$button.trigger('click');
 	}

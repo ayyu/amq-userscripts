@@ -91,6 +91,11 @@
             background: @ready-color;
         }
     }
+    
+    .qpScoreBoardEntry {
+        word-break: normal;
+        white-space: nowrap;
+    }
 
     /* anime */
     
