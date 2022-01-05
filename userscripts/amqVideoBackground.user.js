@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Video Background script
 // @namespace     https://github.com/ayyu/amq-scripts
-// @version       1.0
+// @version       1.0.1
 // @description   Simpler video background script, use with anything you can embed in a <video> tag
 // @author        ayyu
 // @match         https://animemusicquiz.com/*

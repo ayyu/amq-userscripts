@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        	AMQ Custom Commands
 // @namespace   	https://github.com/ayyu/
-// @version     	0.2
+// @version     	0.2.1
 // @description 	Chat commands for custom game modes. spies command from nyamu
 // @author      	ayyu
 // @match       	https://animemusicquiz.com/*

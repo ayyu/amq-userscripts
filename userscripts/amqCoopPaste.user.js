@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        	AMQ Co-op Autopaste
 // @namespace   	https://github.com/ayyu/
-// @version     	2.4
+// @version     	2.4.1
 // @description 	Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.
 // @author      	ayyu
 // @match       	https://animemusicquiz.com/*

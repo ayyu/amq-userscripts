@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Mute on Answer
 // @namespace     https://github.com/ayyu/amq-scripts
-// @version       1.0
+// @version       1.0.1
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
 // @grant         none
