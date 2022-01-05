@@ -24,14 +24,13 @@
   
   function setup() {
     new Listener(
-      answerEvent, function(data) {
+      answerEvent, function() {
         volumeController.setMuted(true);
         volumeController.adjustVolume();
-        console.log('muting');
       }
     ).bindListener();
     new Listener(
-      nextSongEvent, function(data) {
+      nextSongEvent, function() {
         volumeController.setMuted(false);
         volumeController.adjustVolume();
       }
