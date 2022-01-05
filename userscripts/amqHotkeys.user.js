@@ -268,6 +268,7 @@
     'quiz over'
   ];
   let warningEvents = [
+    'Host Game',
     'Join Game',
     'Spectate Game'
   ];
