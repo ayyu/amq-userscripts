@@ -1,13 +1,12 @@
 // ==UserScript==
-// @name         AMQ Mute on Answer
-// @namespace    https://github.com/ayyu/amq-scripts
-// @version      1.0
-// @author       ayyu
-// @match        https://animemusicquiz.com/*
-// @grant        none
-// @require      https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
-// @downloadURL  https://raw.githubusercontent.com/ayyu/amq-scripts/master/userscripts/amqMuteOnAnswer.user.js
-
+// @name          AMQ Mute on Answer
+// @namespace     https://github.com/ayyu/amq-scripts
+// @version       1.0
+// @author        ayyu
+// @match         https://animemusicquiz.com/*
+// @grant         none
+// @require       https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
+// @downloadURL   https://raw.githubusercontent.com/ayyu/amq-scripts/master/userscripts/amqMuteOnAnswer.user.js
 // ==/UserScript==
 
 (() => {

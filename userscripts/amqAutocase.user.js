@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name         AMQ Autocase
-// @namespace    https://github.com/ayyu/
-// @version      1.3
-// @description  Changes your answer to lowercase so you can pretend you didn't use dropdown, or alternate casing to troll.
-// @author       ayyu
-// @match        https://animemusicquiz.com/*
-// @grant        none
-// @require      https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
-// @downloadURL  https://raw.githubusercontent.com/ayyu/amq-scripts/master/userscripts/amqAutocase.user.js
+// @name       	  AMQ Autocase
+// @namespace  	  https://github.com/ayyu/
+// @version    	  1.3
+// @description	  Changes your answer to lowercase so you can pretend you didn't use dropdown, or alternate casing to troll.
+// @author     	  ayyu
+// @match      	  https://animemusicquiz.com/*
+// @grant      	  none
+// @require    	  https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
+// @downloadURL	  https://raw.githubusercontent.com/ayyu/amq-scripts/master/userscripts/amqAutocase.user.js
 // ==/UserScript==
 
 (() => {

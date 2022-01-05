@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name     AMQ Video Background script
-// @namespace  http://tampermonkey.net/
-// @version    0.2
-// @description  Simpler video background script, use with anything you can embed in a <video> tag
-// @author     ayyu
-// @match    https://animemusicquiz.com/*
-// @grant    none
-// @require    https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
-// @downloadURL  https://raw.githubusercontent.com/ayyu/amq-scripts/master/userscripts/amqVideoBackground.user.js
+// @name          AMQ Video Background script
+// @namespace     https://github.com/ayyu/amq-scripts
+// @version       1.0
+// @description   Simpler video background script, use with anything you can embed in a <video> tag
+// @author        ayyu
+// @match         https://animemusicquiz.com/*
+// @grant         none
+// @require       https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
+// @downloadURL   https://raw.githubusercontent.com/ayyu/amq-scripts/master/userscripts/amqVideoBackground.user.js
 // ==/UserScript==
 
 (function() {

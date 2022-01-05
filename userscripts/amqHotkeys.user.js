@@ -1,14 +1,14 @@
 // ==UserScript==
-// @name         AMQ Hotkey Functions
-// @namespace    https://github.com/ayyu/amq-scripts
-// @version      2.0.1
-// @description  Hotkey bindings for lobby functions. Also includes auto ready and auto skip.
-// @description  Customize hotkeys by editing the keyBinds object.
-// @author       ayyu
-// @match        https://animemusicquiz.com/*
-// @grant        none
-// @require      https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
-// @downloadURL  https://raw.githubusercontent.com/ayyu/amq-scripts/master/userscripts/amqHotkeys.user.js
+// @name          AMQ Hotkey Functions
+// @namespace     https://github.com/ayyu/amq-scripts
+// @version       2.0.1
+// @description   Hotkey bindings for lobby functions. Also includes auto ready and auto skip.
+// @description   Customize hotkeys by editing the keyBinds object.
+// @author        ayyu
+// @match         https://animemusicquiz.com/*
+// @grant         none
+// @require       https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
+// @downloadURL   https://raw.githubusercontent.com/ayyu/amq-scripts/master/userscripts/amqHotkeys.user.js
 // ==/UserScript==
 
 (() => {

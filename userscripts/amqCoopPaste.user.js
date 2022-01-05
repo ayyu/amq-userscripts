@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name         AMQ Co-op Autopaste
-// @namespace    https://github.com/ayyu/
-// @version      2.4
-// @description  Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.
-// @author       ayyu
-// @match        https://animemusicquiz.com/*
-// @grant        none
-// @require      https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
-// @downloadURL  https://raw.githubusercontent.com/ayyu/amq-scripts/master/userscripts/amqCoopPaste.user.js
+// @name        	AMQ Co-op Autopaste
+// @namespace   	https://github.com/ayyu/
+// @version     	2.4
+// @description 	Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.
+// @author      	ayyu
+// @match       	https://animemusicquiz.com/*
+// @grant       	none
+// @require     	https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
+// @downloadURL 	https://raw.githubusercontent.com/ayyu/amq-scripts/master/userscripts/amqCoopPaste.user.js
 // ==/UserScript==
 
 (() => {
