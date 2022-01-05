@@ -55,21 +55,22 @@
     new Listener(
       nextSongEvent, () => adjustMuted(false)
     ).bindListener();
+    
+    AMQ_addScriptData({
+      name: "Mute on Answer",
+      author: "ayyu",
+      description: `
+        <p>Mutes volume once you enter an answer, in case you're multi tasking 
+        or hate the song you're listening to.</p>
+        <p>Adds toggleable button in-game <i aria-hidden="true" class="fa fa-bath"></i></p>
+      `
+    });
+
+    AMQ_addStyle(`#qpMuteAnswerButton {
+      width: 30px;
+      height: 100%;
+      margin-right: 5px;
+    }`);
   }
-
-  AMQ_addScriptData({
-    name: "Mute on Answer",
-    author: "ayyu",
-    description: `
-      <p>Mutes volume once you enter an answer, in case you're multi tasking 
-      or hate the song you're listening to.</p>
-      <p>Adds toggleable button in-game <i aria-hidden="true" class="fa fa-bath"></i></p>
-    `
-  });
-
-  AMQ_addStyle(`#qpMuteAnswerButton {
-    width: 30px;
-    height: 100%;
-    margin-right: 5px;
-  }`);
+  
 })();
