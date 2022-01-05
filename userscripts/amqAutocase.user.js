@@ -7,7 +7,7 @@
 // @match      	  https://animemusicquiz.com/*
 // @grant      	  none
 // @require    	  https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
-// @downloadURL	  https://raw.githubusercontent.com/ayyu/amq-scripts/master/userscripts/amqAutocase.user.js
+// @downloadURL	  https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqAutocase.user.js
 // ==/UserScript==
 
 (() => {
