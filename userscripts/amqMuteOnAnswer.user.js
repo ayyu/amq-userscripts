@@ -22,14 +22,19 @@
   let answerEvent = "quiz answer";
   let nextSongEvent = "play next song";
   
-  new Listener(
-    answerEvent, function(data) {
-      volumeController.setMuted(true);
-    }
-  ).bindListener();
-  new Listener(
-    nextSongEvent, function(data) {
-      volumeController.setMuted(false);
-    }
-  ).bindListener();
+  function setup() {
+    new Listener(
+      answerEvent, function(data) {
+        volumeController.setMuted(true);
+        volumeController.adjustVolume();
+        console.log('muting');
+      }
+    ).bindListener();
+    new Listener(
+      nextSongEvent, function(data) {
+        volumeController.setMuted(false);
+        volumeController.adjustVolume();
+      }
+    ).bindListener();
+  }
 })();
