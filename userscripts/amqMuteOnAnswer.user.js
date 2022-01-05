@@ -13,11 +13,11 @@
 (() => {
   if (document.getElementById('startPage')) return;
   let loadInterval = setInterval(() => {
-		if (document.getElementById("loadingScreen").classList.contains("hidden")) {
+    if (document.getElementById("loadingScreen").classList.contains("hidden")) {
       setup();
       clearInterval(loadInterval);
-		}
-	}, 500);
+    }
+  }, 500);
   
   let answerEvent = "quiz answer";
   let nextSongEvent = "play next song";
@@ -38,17 +38,17 @@
     <i aria-hidden="true" class="fa fa-bath qpMenuItem"></i>
     </div>`);
     toggleButton.popover({
-			placement: "bottom",
-			content: "Toggle muting on answer",
-			trigger: "hover"
-		});
+      placement: "bottom",
+      content: "Toggle muting on answer",
+      trigger: "hover"
+    });
     toggleButton.click(() => {
-			toggleActive = !toggleActive;
-			gameChat.systemMessage((toggleActive ? "Enabled" : "Disabled") + " muting on answer.");
-			$(`#qpMuteAnswerButton i`).toggleClass("fa-inverse", toggleActive);
-		});
-		$(`#qpOptionContainer`).width($(`#qpOptionContainer`).width() + 35);
-		$(`#qpOptionContainer > div`).append(toggleButton);
+      toggleActive = !toggleActive;
+      gameChat.systemMessage((toggleActive ? "Enabled" : "Disabled") + " muting on answer.");
+      $(`#qpMuteAnswerButton i`).toggleClass("fa-inverse", toggleActive);
+    });
+    $(`#qpOptionContainer`).width($(`#qpOptionContainer`).width() + 35);
+    $(`#qpOptionContainer > div`).append(toggleButton);
 
     new Listener(
       answerEvent, () => adjustMuted(true)
