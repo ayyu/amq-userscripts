@@ -10,7 +10,7 @@
 
 // ==/UserScript==
 
-(function() {
+(() => {
   if (document.getElementById('startPage')) return;
   let loadInterval = setInterval(() => {
 		if (document.getElementById("loadingScreen").classList.contains("hidden")) {
@@ -21,19 +21,40 @@
   
   let answerEvent = "quiz answer";
   let nextSongEvent = "play next song";
+
+  let toggleButton;
+  let toggleActive;
+
+  function adjustMuted(muted) {
+    if (toggleActive) {
+      volumeController.setMuted(muted);
+      volumeController.adjustVolume();
+    }
+  }
   
   function setup() {
+    toggleActive = false;
+    toggleButton = $(`<div id="qpMuteAnswerButton" class="clickAble qpOption">
+    <i aria-hidden="true" class="fa fa-bath qpMenuItem"></i>
+    </div>`);
+    toggleButton.popover({
+			placement: "bottom",
+			content: "Toggle muting on answer",
+			trigger: "hover"
+		});
+    toggleButton.click(() => {
+			toggleActive = !toggleActive;
+			gameChat.systemMessage((toggleActive ? "Enabled" : "Disabled") + " muting on answer.");
+			$(`#qpMuteAnswerButton i`).toggleClass("fa-inverse", toggleActive);
+		});
+		$(`#qpOptionContainer`).width($(`#qpOptionContainer`).width() + 35);
+		$(`#qpOptionContainer > div`).append(toggleButton);
+
     new Listener(
-      answerEvent, function() {
-        volumeController.setMuted(true);
-        volumeController.adjustVolume();
-      }
+      answerEvent, () => adjustMuted(true)
     ).bindListener();
     new Listener(
-      nextSongEvent, function() {
-        volumeController.setMuted(false);
-        volumeController.adjustVolume();
-      }
+      nextSongEvent, () => adjustMuted(false)
     ).bindListener();
   }
 })();
