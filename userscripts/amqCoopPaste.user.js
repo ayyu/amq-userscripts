@@ -93,8 +93,7 @@
 			description: `
 				<p>Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.</p>
 				<p>Adds toggleable button in-game <i aria-hidden="true" class="fa fa-clipboard"></i></p>
-			`
-		});
+			`});
 
 		AMQ_addStyle(`#qpCoopButton {
 			width: 30px;

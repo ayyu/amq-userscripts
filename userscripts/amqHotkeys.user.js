@@ -294,6 +294,7 @@
       (prev, curr) => {
         return prev + `<li>${curr}</li>`;
       }, '');
+      
     AMQ_addScriptData({
       name: 'Hotkey Functions',
       author: 'ayyu',

@@ -105,7 +105,6 @@
 			width: 30px;
 			height: 100%;
 			margin-right: 5px;
-		}
-		`);
+		}`);
 	}
 })();

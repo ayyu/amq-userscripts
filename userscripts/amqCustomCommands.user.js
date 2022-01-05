@@ -46,4 +46,10 @@
     }
   }
 
+  AMQ_addScriptData({
+    name: "Custom Commands",
+    author: "ayyu",
+    description: `<p>Some custom chat commands. Currently only has the one for assigning spies.</p>`
+  });
+
 })();
