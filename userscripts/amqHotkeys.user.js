@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Hotkey Functions
 // @namespace     https://github.com/ayyu/amq-scripts
-// @version       2.0.2
+// @version       2.0.3
 // @description   Hotkey bindings for lobby functions. Also includes auto ready and auto skip.
 // @description   Customize hotkeys by editing the keyBinds object.
 // @author        ayyu
@@ -15,83 +15,95 @@
   // set your keybinds here
   let keybinds = [
     {
-      'mod': ['alt'],
-      'key': 'Backspace',
+      'description': 'pause quiz',
       'callback': pauseQuiz,
-      'description': 'pause quiz'
+      'key': 'Backspace',
+      'mod': ['alt'],
     },
     {
-      'mod': [],
-      'key': 'Escape',
+      'description': 'remove ghost tooltips',
       'callback': clearTooltips,
-      'description': 'remove ghost tooltips'
-    },
-    {
-      'mod': ['alt'],
-      'key': 'ArrowUp',
-      'callback': startLobby,
-      'description': 'start game if all players are ready'
-    },
-    {
-      'mod': ['alt'],
-      'key': 'ArrowDown',
-      'callback': returnLobby,
-      'description': 'start vote for returning to lobby, or add your vote to return'
-    },
-    {
-      'mod': ['alt'],
-      'key': 'ArrowLeft',
-      'callback': joinLobby,
-      'description': 'switch to player'
-    },
-    {
-      'mod': ['alt'],
-      'key': 'ArrowRight',
-      'callback': joinSpec,
-      'description': 'switch to spectator'
-    },
-    {
-      'mod': ['alt'],
-      'key': '`',
-      'callback': toggleTeamChat,
-      'description': 'toggle team chat'
-    },
-    {
-      'mod': ['ctrl'],
-      'key': 'Enter',
-      'callback': voteSkip,
-      'description': 'vote to skip current song'
-    },
-    {
+      'key': 'Escape',
       'mod': [],
-      'key': 'Tab',
-      'callback': focusAnswer,
-      'description': 'focus cursor on answer box'
     },
     {
-      'mod': ['shift'],
-      'key': 'Tab',
-      'callback': focusChat,
-      'description': 'focus cursor on chat'
+      'description': 'start game if all players are ready',
+      'callback': startLobby,
+      'key': 'ArrowUp',
+      'mod': ['alt'],
     },
     {
-      'mod': ['alt', 'shift'],
+      'description': 'start vote for returning to lobby, or add your vote to return',
+      'callback': returnLobby,
+      'key': 'ArrowDown',
+      'mod': ['alt'],
+    },
+    {
+      'description': 'switch to player',
+      'callback': joinLobby,
+      'key': 'ArrowLeft',
+      'mod': ['alt'],
+    },
+    {
+      'description': 'switch to spectator',
+      'callback': joinSpec,
+      'key': 'ArrowRight',
+      'mod': ['alt'],
+    },
+    {
+      'description': 'toggle team chat',
+      'callback': () => $(`#gcTeamChatSwitch`).trigger('click'),
+      'key': '`',
+      'mod': ['alt'],
+    },
+    {
+      'description': 'vote to skip current song',
+      'callback': () => quiz.skipClicked(),
       'key': 'Enter',
+      'mod': ['ctrl'],
+    },
+    {
+      'description': 'focus cursor on answer box',
+      'callback': focusAnswer,
+      'key': 'Tab',
+      'mod': [],
+    },
+    {
+      'description': 'focus cursor on chat',
+      'callback': focusChat,
+      'key': 'Tab',
+      'mod': ['shift'],
+    },
+    {
+      'description': 'copy paste latest message in chat',
       'callback': copyPasta,
-      'description': 'copy paste latest message in chat'
+      'key': 'Enter',
+      'mod': ['alt', 'shift'],
     },
     {
-      'mod': ['alt'],
+      'description': 'toggle auto skip',
+      'callback': () => toggle('auto skip'),
       'key': 'z',
-      'callback': toggleAutoSkip,
-      'description': 'toggle auto skip'
+      'mod': ['alt'],
     },
     {
-      'mod': ['alt'],
+      'description': 'toggle auto ready',
+      'callback': () => toggle('auto ready'),
       'key': 'r',
-      'callback': toggleAutoReady,
-      'description': 'toggle auto ready'
+      'mod': ['alt'],
     },
+    /*{
+      'description': 'toggle mute on answer',
+      'callback': () => $(`#qpMuteAnswerButton`).trigger('click'),
+      'key': 'm',
+      'mod': ['ctrl', 'alt'],
+    },
+    {
+      'description': 'toggle co-op paste',
+      'callback': () => $(`#qpCoopButton`).trigger('click'),
+      'key': 'p',
+      'mod': ['ctrl', 'alt'],
+    },*/
   ];
 
   if (document.getElementById('startPage')) return;
@@ -134,12 +146,11 @@
   }
 
   function joinLobby() {
-    if (lobby.isSpectator) {
-      socket.sendCommand({
-        type: 'lobby',
-        command: 'change to player'
-      });
-    }
+    if (!lobby.isSpectator) return;
+    socket.sendCommand({
+      type: 'lobby',
+      command: 'change to player'
+    });
   }
 
   function joinSpec() {
@@ -177,12 +188,8 @@
   // local UI functions
 
   function clearTooltips() {
-    $(`[id^=tooltip]`).remove(); $(`[id^=popover]`).remove();
-  }
-
-  function voteSkip() {
-    if (quiz.isSpectator) return;
-    quiz.skipClicked();
+    $(`[id^=tooltip]`).remove();
+    $(`[id^=popover]`).remove();
   }
 
   function focusAnswer() {
@@ -197,20 +204,9 @@
     $(`#gcInput`).focus();
   }
 
-  function toggleTeamChat() {
-    $(`#gcTeamChatSwitch`).trigger('click');
-  }
-
-  function _toggle(prop) {
+  function toggle(prop) {
     toggles[prop] = !toggles[prop];
     gameChat.systemMessage((toggles[prop] ? "Enabled" : "Disabled") + ` ${prop}.`);
-  }
-
-  function toggleAutoSkip() {
-    _toggle('auto skip');
-  }
-  function toggleAutoReady() {
-    _toggle('auto ready');
   }
 
   // pretty printing of hotkeys for script data
@@ -277,7 +273,7 @@
     // autoskip
     new Listener("play next song", () => {
       setTimeout(() => {
-        if (toggles['auto skip']) voteSkip();
+        if (toggles['auto skip']) quiz.skipClicked();
       }, 500);
     }).bindListener();
     // autoready
