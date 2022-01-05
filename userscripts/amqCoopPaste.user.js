@@ -78,17 +78,13 @@
 		// listener for submission
 		new Listener("quiz answer", answerHandler).bindListener();
 
-		// clear upon new song last answer
-		new Listener("answer results", () => {
-			lastAnswer = "";
-		}).bindListener();
+		// clear last answer upon new song
+		new Listener("answer results", () => { lastAnswer = ""; }).bindListener();
 
 		// enter answers that are pasted
 		new Listener("game chat message", messageHandler).bindListener();
 		new Listener("game chat update", (payload) => {
-			payload.messages.forEach(message => {
-				messageHandler(message);
-			});
+			payload.messages.forEach(message => messageHandler(message));
 		}).bindListener();
 
 		AMQ_addScriptData({
