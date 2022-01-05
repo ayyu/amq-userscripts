@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Co-op Autopaste
 // @namespace    https://github.com/ayyu/
-// @version      2.2
+// @version      2.3
 // @description  Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.
 // @author       ayyu
 // @match        https://animemusicquiz.com/*
@@ -21,20 +21,12 @@
 
 	let coopButton;
 	let coopPaste = false;
-
-	let prefix = "[cp]";
-	let re = new RegExp("^"+escapeRegex(prefix));
-	let lastAnswer = "";
-
 	let pasted = false;
 
-	function decorate(string) {
-		return prefix+string;
-	}
-
-	function escapeRegex(string) {
-		return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-	}
+	let prefix = "[cp] ";
+	
+	let rePrefix = new RegExp("^" + prefix.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
+	let lastAnswer = "";
 
 	function ciCompare(a, b) {
 		if (typeof a != "string" || typeof b != "string") return false;
@@ -42,23 +34,22 @@
 	}
 
 	function answerHandler(answer) {
-		if (quiz.gameMode === "Ranked") {
-			return;
-		}
+		if (quiz.gameMode === "Ranked") return;
 		
 		if (coopPaste && !ciCompare(answer, lastAnswer) && !pasted) {
-			gameChat.$chatInputField.val(decorate(answer));
-			gameChat.sendMessage();
-			lastAnswer = answer;
+			socket.sendCommand({
+				type: 'lobby',
+				command: 'game chat message',
+				data: { msg: prefix + answer, teamMessage: false }
+			});
 		}
-		if (pasted) {
-			pasted = false;
-		}
+
+		if (pasted) pasted = false;
 	}
 
 	function messageHandler(payload) {
-		if (coopPaste && payload.sender != selfName && re.test(payload.message)) {
-			answer = payload.message.replace(re, '');
+		if (coopPaste && payload.sender != selfName && rePrefix.test(payload.message)) {
+			answer = payload.message.replace(rePrefix, '');
 			if (!ciCompare(quiz.answerInput.quizAnswerState.submittedAnswer, answer)) {
 				pasted = true;
 				quiz.answerInput.setNewAnswer(answer);
@@ -74,9 +65,9 @@
 			trigger: "hover"
 		});
 		coopButton.click(function () {
-			msg = (coopPaste ? "Disabled" : "Enabled") + " co-op paste to chat.";
-			gameChat.systemMessage(msg);
 			coopPaste = !coopPaste;
+			msg = (coopPaste ? "Enabled" : "Disabled") + " co-op paste to chat.";
+			gameChat.systemMessage(msg);
 			$(`#qpCoopButton i`).toggleClass("fa-inverse", coopPaste);
 		});
 
