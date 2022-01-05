@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Autocase
 // @namespace    https://github.com/ayyu/
-// @version      1.2
+// @version      1.3
 // @description  Changes your answer to lowercase so you can pretend you didn't use dropdown, or alternate casing to troll.
 // @author       ayyu
 // @match        https://animemusicquiz.com/*
@@ -10,7 +10,7 @@
 // @downloadURL  https://raw.githubusercontent.com/ayyu/amq-scripts/master/userscripts/amqAutocase.user.js
 // ==/UserScript==
 
-(function() {
+(() => {
 	if (document.getElementById('startPage')) return;
 	let loadInterval = setInterval(() => {
 		if (document.getElementById("loadingScreen").classList.contains("hidden")) {
@@ -24,6 +24,7 @@
 	let button;
 	let toggleState = "none";
 	// states: none lower alternate
+
 	let msg;
 	
 	function quizJoinHandler(data) {
@@ -36,10 +37,12 @@
 		if (event.which === 13) { // enter key
 			switch (toggleState) {
 				case "lower":
-				quiz.answerInput.setNewAnswer(answer.toLowerCase());
-				break;
+					quiz.answerInput.setNewAnswer(answer.toLowerCase());
+					break;
 				case "alternate":
-				quiz.answerInput.setNewAnswer(answer.replace(/[a-z]/gi, c => c[`to${(answer = !answer) ? 'Upp' : 'Low'}erCase`]()));
+					quiz.answerInput.setNewAnswer(
+						answer.replace(/[a-z]/gi, c => c[`to${(answer = !answer) ? 'Upp' : 'Low'}erCase`]())
+					);
 			}
 		}
 	}
@@ -48,20 +51,20 @@
 		$(`#qpCaseButton i`).removeClass("fa-font fa-wheelchair fa-wheelchair-alt");
 		switch (toggleState) {
 			case "none":
-			msg = "Enabled auto lowercase";
-			toggleState = "lower";
-			$(`#qpCaseButton i`).addClass("fa-wheelchair fa-inverse");
-			break;
+				msg = "Enabled auto lowercase";
+				toggleState = "lower";
+				$(`#qpCaseButton i`).addClass("fa-wheelchair fa-inverse");
+				break;
 			case "lower":
-			msg = "Enabled auto alternate case";
-			toggleState = "alternate";
-			$(`#qpCaseButton i`).addClass("fa-wheelchair-alt fa-inverse");
-			break;
+				msg = "Enabled auto alternate case";
+				toggleState = "alternate";
+				$(`#qpCaseButton i`).addClass("fa-wheelchair-alt fa-inverse");
+				break;
 			case "alternate":
-			msg = "Disabled auto case";
-			$(`#qpCaseButton i`).addClass("fa-font");
-			$(`#qpCaseButton i`).removeClass("fa-inverse");
-			toggleState = "none";
+				msg = "Disabled auto case";
+				$(`#qpCaseButton i`).addClass("fa-font");
+				$(`#qpCaseButton i`).removeClass("fa-inverse");
+				toggleState = "none";
 		}
 		gameChat.systemMessage(msg);
 	}

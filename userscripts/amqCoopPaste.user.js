@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Co-op Autopaste
 // @namespace    https://github.com/ayyu/
-// @version      2.3
+// @version      2.4
 // @description  Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.
 // @author       ayyu
 // @match        https://animemusicquiz.com/*
@@ -10,7 +10,7 @@
 // @downloadURL  https://raw.githubusercontent.com/ayyu/amq-scripts/master/userscripts/amqCoopPaste.user.js
 // ==/UserScript==
 
-(function() {
+(() => {
 	if (document.getElementById('startPage')) return;
 	let loadInterval = setInterval(() => {
 		if (document.getElementById("loadingScreen").classList.contains("hidden")) {
@@ -23,7 +23,7 @@
 	let coopPaste = false;
 	let pasted = false;
 
-	let prefix = "[cp] ";
+	let prefix = "[CP] ";
 	
 	let rePrefix = new RegExp("^" + prefix.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
 	let lastAnswer = "";
@@ -33,8 +33,9 @@
 		return a.trim().toUpperCase() == b.trim().toUpperCase();
 	}
 
-	function answerHandler(answer) {
+	function answerHandler(payload) {
 		if (quiz.gameMode === "Ranked") return;
+		answer = payload.answer
 		
 		if (coopPaste && !ciCompare(answer, lastAnswer) && !pasted) {
 			socket.sendCommand({
@@ -43,7 +44,6 @@
 				data: { msg: prefix + answer, teamMessage: false }
 			});
 		}
-
 		if (pasted) pasted = false;
 	}
 
@@ -66,8 +66,7 @@
 		});
 		coopButton.click(function () {
 			coopPaste = !coopPaste;
-			msg = (coopPaste ? "Enabled" : "Disabled") + " co-op paste to chat.";
-			gameChat.systemMessage(msg);
+			gameChat.systemMessage((coopPaste ? "Enabled" : "Disabled") + " co-op paste to chat.");
 			$(`#qpCoopButton i`).toggleClass("fa-inverse", coopPaste);
 		});
 
@@ -77,19 +76,15 @@
 		$(`#qpOptionContainer > div`).append(coopButton);
 
 		// listener for submission
-		new Listener("quiz answer", (payload) => {
-			answerHandler(payload.answer);
-		}).bindListener();
+		new Listener("quiz answer", answerHandler).bindListener();
 
 		// clear upon new song last answer
-		new Listener("answer results", (data) => {
+		new Listener("answer results", () => {
 			lastAnswer = "";
 		}).bindListener();
 
 		// enter answers that are pasted
-		new Listener("game chat message", (payload) => {
-			messageHandler(payload);
-		}).bindListener();
+		new Listener("game chat message", messageHandler).bindListener();
 		new Listener("game chat update", (payload) => {
 			payload.messages.forEach(message => {
 				messageHandler(message);
