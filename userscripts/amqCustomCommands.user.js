@@ -11,10 +11,13 @@
 // ==/UserScript==
 
 (() => {
-  new Listener("Game Chat Message", processChatCommand).bindListener();
-  new Listener("game chat update", (payload) => {
-    payload.messages.forEach(message => processChatCommand(message));
-  }).bindListener();
+  if (document.getElementById('startPage')) return;
+	let loadInterval = setInterval(() => {
+		if (document.getElementById("loadingScreen").classList.contains("hidden")) {
+			setup();
+			clearInterval(loadInterval);
+		}
+	}, 500);
 
   // knuth
   function shuffleArray(array) {
@@ -44,12 +47,19 @@
         }, 1000 * i, assassin, spy);
       }
     }
-
+  }
+  
+  function setup() {
+    new Listener("Game Chat Message", processChatCommand).bindListener();
+    new Listener("game chat update", (payload) => {
+      payload.messages.forEach(message => processChatCommand(message));
+    }).bindListener();
+    
     AMQ_addScriptData({
       name: "Custom Commands",
       author: "ayyu",
       description: `<p>Some custom chat commands. Currently only has the one for assigning spies.</p>`
     });
   }
-
+  
 })();
