@@ -257,6 +257,7 @@
         command: 'set ready',
         data: { ready: true }
       });
+      lobby.updateMainButton();
     }, 50);
   }
   let readyEvents = [
