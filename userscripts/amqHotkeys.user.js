@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Hotkey Functions
 // @namespace     https://github.com/ayyu/amq-scripts
-// @version       2.0.3
+// @version       2.0.4
 // @description   Hotkey bindings for lobby functions. Also includes auto ready and auto skip.
 // @description   Customize hotkeys by editing the keyBinds object.
 // @author        ayyu
@@ -13,7 +13,7 @@
 
 (() => {
   // set your keybinds here
-  let keybinds = [
+  const keybinds = [
     {
       'description': 'pause quiz',
       'callback': pauseQuiz,
@@ -33,7 +33,7 @@
       'mod': ['alt'],
     },
     {
-      'description': 'start vote for returning to lobby, or add your vote to return',
+      'description': 'start vote for returning to lobby, or vote to return',
       'callback': returnLobby,
       'key': 'ArrowDown',
       'mod': ['alt'],
@@ -193,7 +193,7 @@
   }
 
   function focusAnswer() {
-    if (quiz.isSpectator) return
+    if (quiz.isSpectator) return;
     $(`#gcInput`).blur();
     quiz.setInputInFocus(true);
     $(`#qpAnswerInput`).focus();
@@ -206,15 +206,17 @@
 
   function toggle(prop) {
     toggles[prop] = !toggles[prop];
-    gameChat.systemMessage((toggles[prop] ? "Enabled" : "Disabled") + ` ${prop}.`);
+    gameChat.systemMessage(
+      (toggles[prop] ? "Enabled" : "Disabled") + ` ${prop}.`
+    );
   }
 
   // pretty printing of hotkeys for script data
   function keybindToString(keybind) {
-    const modString = keybind.mod.reduce((prev, curr) => {
+    var modString = keybind.mod.reduce((prev, curr) => {
       return prev + `<kbd>${curr}</kbd> + `;
     }, "");
-    const keyString = `<kbd>${keybind.key}</kbd>`;
+    var keyString = `<kbd>${keybind.key}</kbd>`;
     return `${modString}${keyString}: ${keybind.description}`;
   }
 
@@ -232,22 +234,22 @@
       }
     });
   }
-  
-  function notifyToggles(event) {
-    if (event.error) return;
-    for (const toggle in toggles) {
-      if (toggles[toggle]) gameChat.systemMessage(`WARNING: ${toggle} is currently enabled.`);
-    }
-  }
 
+  const readyEvents = [
+    'Room Settings Changed',
+    'Host Promotion',
+    'Join Game',
+    'Change To Player',
+    'quiz over'
+  ];
   function checkReady() {
     setTimeout(() => {
       if (!toggles['auto ready']
-        || lobby.isHost
-        || !lobby.inLobby
-        || lobby.isSpectator
-        || lobby.isReady
-        || quiz.gameMode == 'Ranked') return;
+          || lobby.isHost
+          || !lobby.inLobby
+          || lobby.isSpectator
+          || lobby.isReady
+          || quiz.gameMode == 'Ranked') return;
       socket.sendCommand({
         type: 'lobby',
         command: 'set ready',
@@ -256,47 +258,47 @@
       lobby.updateMainButton();
     }, 50);
   }
-  let readyEvents = [
-    'Room Settings Changed',
-    'Host Promotion',
-    'Join Game',
-    'Change To Player',
-    'quiz over'
-  ];
-  let warningEvents = [
+
+  const warningEvents = [
     'Host Game',
     'Join Game',
     'Spectate Game'
   ];
+  function notifyToggles(event) {
+    if (event.error) return;
+    for (const toggle in toggles) {
+      if (toggles[toggle]) {
+        gameChat.systemMessage(`WARNING: ${toggle} is currently enabled.`);
+      }
+    }
+  }
 
   function setup() {
     // autoskip
-    new Listener("play next song", () => {
+    new Listener("play next song", () => (
       setTimeout(() => {
         if (toggles['auto skip']) quiz.skipClicked();
-      }, 500);
-    }).bindListener();
+      }, 500)
+    )).bindListener();
     // autoready
-    for (const event of readyEvents) {
-      new Listener(event, checkReady).bindListener();
-    }
-
-    // warn about active toggles when joining a game
-    for (const event of warningEvents) {
-      new Listener(event, notifyToggles).bindListener();
-    }
+    readyEvents.forEach(
+      event => new Listener(event, checkReady).bindListener()
+    );
+    // toggle warnings
+    warningEvents.forEach(
+      event => new Listener(event, notifyToggles).bindListener()
+    );
 
     document.addEventListener('keydown', onKeyDown, false);
     const keybindString = keybinds.map(keybindToString).reduce(
-      (prev, curr) => {
-        return prev + `<li>${curr}</li>`;
-      }, '');
-      
+      (prev, curr) => prev + `<li>${curr}</li>`, ''
+    );
+    
     AMQ_addScriptData({
       name: 'Hotkey Functions',
       author: 'ayyu',
       description:
-        `<p>Streamlined version inspired by nyamu's hotkey script that conflicts less with normal browser usage.
+        `<p>Custom hotkeys for various lobby and game actions.
         Customize hotkeys by editing the keyBinds object in the script.</p>
         <p>Current keybinds:</p>
         <ul>

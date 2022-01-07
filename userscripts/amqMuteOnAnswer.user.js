@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Mute on Answer
 // @namespace     https://github.com/ayyu/amq-scripts
-// @version       1.0.1
+// @version       1.0.2
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
 // @grant         none
@@ -18,24 +18,26 @@
     }
   }, 500);
   
-  let answerEvent = "quiz answer";
-  let nextSongEvent = "play next song";
+  const answerEvent = "quiz answer";
+  const nextSongEvent = "play next song";
 
-  let toggleButton;
-  let toggleActive;
+  const toggleButtonID = 'qpMuteAnswerButton';
+  const faIcon = 'fa-bath';
+  const toggleButton = $(
+    `<div id="${toggleButtonID}" class="clickAble qpOption">
+      <i aria-hidden="true" class="fa ${faIcon} qpMenuItem"></i>
+    </div>`
+  );
+  
+  let toggleActive = false;
 
   function adjustMuted(muted) {
-    if (toggleActive) {
-      volumeController.setMuted(muted);
-      volumeController.adjustVolume();
-    }
+    if (!toggleActive) return;
+    volumeController.setMuted(muted);
+    volumeController.adjustVolume();
   }
   
   function setup() {
-    toggleActive = false;
-    toggleButton = $(`<div id="qpMuteAnswerButton" class="clickAble qpOption">
-    <i aria-hidden="true" class="fa fa-bath qpMenuItem"></i>
-    </div>`);
     toggleButton.popover({
       placement: "bottom",
       content: "Toggle muting on answer",
@@ -43,18 +45,16 @@
     });
     toggleButton.click(() => {
       toggleActive = !toggleActive;
-      gameChat.systemMessage((toggleActive ? "Enabled" : "Disabled") + " muting on answer.");
-      $(`#qpMuteAnswerButton i`).toggleClass("fa-inverse", toggleActive);
+      gameChat.systemMessage(
+        (toggleActive ? "Enabled" : "Disabled") + " muting on answer."
+      );
+      $(`#${toggleButtonID} i`).toggleClass("fa-inverse", toggleActive);
     });
     $(`#qpOptionContainer`).width($(`#qpOptionContainer`).width() + 35);
     $(`#qpOptionContainer > div`).append(toggleButton);
 
-    new Listener(
-      answerEvent, () => adjustMuted(true)
-    ).bindListener();
-    new Listener(
-      nextSongEvent, () => adjustMuted(false)
-    ).bindListener();
+    new Listener(answerEvent, () => adjustMuted(true)).bindListener();
+    new Listener(nextSongEvent, () => adjustMuted(false)).bindListener();
     
     AMQ_addScriptData({
       name: "Mute on Answer",
@@ -62,11 +62,12 @@
       description: `
         <p>Mutes volume once you enter an answer, in case you're multi tasking 
         or hate the song you're listening to.</p>
-        <p>Adds toggleable button in-game <i aria-hidden="true" class="fa fa-bath"></i></p>
+        <p>Adds toggleable button in-game:
+        <i aria-hidden="true" class="fa ${faIcon}"></i></p>
       `
     });
 
-    AMQ_addStyle(`#qpMuteAnswerButton {
+    AMQ_addStyle(`#${toggleButtonID} {
       width: 30px;
       height: 100%;
       margin-right: 5px;

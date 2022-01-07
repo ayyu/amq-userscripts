@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Video Background script
 // @namespace     https://github.com/ayyu/amq-scripts
-// @version       1.0.1
+// @version       1.0.2
 // @description   Simpler video background script, use with anything you can embed in a <video> tag
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
@@ -11,17 +11,22 @@
 // ==/UserScript==
 
 (function() {
-  let videos = [
+  // array of URLs to video files to be chosen from
+  const videos = [
     "https://openings.moe/video/KodomoNoJikan-ED01-NCOLD.mp4",
     "https://openings.moe/video/KodomoNoJikanNiGakki-OP01-NCOLD.webm",
   ];
   
-  let video = videos[Math.round(Math.random() * (videos.length - 1))];
-  let template = $(`<video id="custom-background" autoplay loop muted><source src="${video}"></video>`);
+  const video = videos[Math.round(Math.random() * (videos.length - 1))];
+  const template = $(
+    `<video id="custom-background" autoplay loop muted>
+      <source src="${video}">
+    </video>`
+  );
   
-  let opacity = `0.8`;
-  let bgGray = `rgba(66, 66, 66, ${opacity})`;
-  let bgBlack = `rgba(27, 27, 27, ${opacity})`;
+  const opacity = `0.8`;
+  const bgGray = `rgba(66, 66, 66, ${opacity})`;
+  const bgBlack = `rgba(27, 27, 27, ${opacity})`;
   
   $("#mainContainer").append(template);
   

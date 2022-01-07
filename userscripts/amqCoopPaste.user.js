@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        	AMQ Co-op Autopaste
 // @namespace   	https://github.com/ayyu/
-// @version     	2.4.1
+// @version     	2.4.2
 // @description 	Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.
 // @author      	ayyu
 // @match       	https://animemusicquiz.com/*
@@ -11,94 +11,109 @@
 // ==/UserScript==
 
 (() => {
-	if (document.getElementById('startPage')) return;
-	let loadInterval = setInterval(() => {
-		if (document.getElementById("loadingScreen").classList.contains("hidden")) {
-			setup();
-			clearInterval(loadInterval);
-		}
-	}, 500);
+  if (document.getElementById('startPage')) return;
+  let loadInterval = setInterval(() => {
+    if (document.getElementById("loadingScreen").classList.contains("hidden")) {
+      setup();
+      clearInterval(loadInterval);
+    }
+  }, 500);
 
-	let coopButton;
-	let coopPaste = false;
-	let pasted = false;
+  const toggleButtonID = 'qpCoopButton';
+  const faIcon = 'fa-clipboard';
+  const toggleButton = $(
+    `<div id="${toggleButtonID}" class="clickAble qpOption">
+      <i aria-hidden="true" class="fa ${faIcon} qpMenuItem"></i>
+    </div>`
+  );
 
-	let prefix = "[CP] ";
-	
-	let rePrefix = new RegExp("^" + prefix.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
-	let lastAnswer = "";
+  const prefix = "[CP] ";
+  const rePrefix = new RegExp(
+    "^" + prefix.replace(/[-\/\\^$*+?.()|[\]{}]/g,
+    '\\$&'
+  ));
+  
+  let toggleActive = false;
+  let pasted = false;
+  let lastAnswer = "";
 
-	function ciCompare(a, b) {
-		if (typeof a != "string" || typeof b != "string") return false;
-		return a.trim().toUpperCase() == b.trim().toUpperCase();
-	}
+  function ciCompare(a, b) {
+    if (typeof a != "string" || typeof b != "string") return false;
+    return a.trim().toUpperCase() == b.trim().toUpperCase();
+  }
 
-	function answerHandler(payload) {
-		if (quiz.gameMode === "Ranked") return;
-		answer = payload.answer
-		
-		if (coopPaste && !ciCompare(answer, lastAnswer) && !pasted) {
-			socket.sendCommand({
-				type: 'lobby',
-				command: 'game chat message',
-				data: { msg: prefix + answer, teamMessage: false }
-			});
-		}
-		if (pasted) pasted = false;
-	}
+  function answerHandler(payload) {
+    if (!toggleActive
+        || quiz.gameMode == "Ranked"
+        || pasted) return;
+    
+    answer = payload.answer
+    if (ciCompare(answer, lastAnswer)) return;
+    
+    socket.sendCommand({
+      type: 'lobby',
+      command: 'game chat message',
+      data: { msg: prefix + answer, teamMessage: false }
+    });
+    pasted = false;
+  }
 
-	function messageHandler(payload) {
-		if (coopPaste && payload.sender != selfName && rePrefix.test(payload.message)) {
-			answer = payload.message.replace(rePrefix, '');
-			if (!ciCompare(quiz.answerInput.quizAnswerState.submittedAnswer, answer)) {
-				pasted = true;
-				quiz.answerInput.setNewAnswer(answer);
-			}
-		}
-	}
+  function messageHandler(payload) {
+    if (!toggleActive
+        || payload.sender == selfName
+        || !rePrefix.test(payload.message)) return;
+    answer = payload.message.replace(rePrefix, '');
+    if (!ciCompare(quiz.answerInput.quizAnswerState.submittedAnswer, answer)) {
+      pasted = true;
+      quiz.answerInput.setNewAnswer(answer);
+    }
+  }
 
-	function setup() {
-		coopButton = $(`<div id="qpCoopButton" class="clickAble qpOption"><i aria-hidden="true" class="fa fa-clipboard qpMenuItem"></i></div>`);
-		coopButton.popover({
-			placement: "bottom",
-			content: "Toggle co-op copy paste to chat",
-			trigger: "hover"
-		});
-		coopButton.click(function () {
-			coopPaste = !coopPaste;
-			gameChat.systemMessage((coopPaste ? "Enabled" : "Disabled") + " co-op paste to chat.");
-			$(`#qpCoopButton i`).toggleClass("fa-inverse", coopPaste);
-		});
+  function setup() {
+    toggleButton.popover({
+      placement: "bottom",
+      content: "Toggle co-op copy paste to chat",
+      trigger: "hover"
+    });
+    toggleButton.click(() => {
+      toggleActive = !toggleActive;
+      gameChat.systemMessage(
+        (toggleActive ? "Enabled" : "Disabled") + " co-op paste to chat."
+      );
+      $(`#${toggleButtonID} i`).toggleClass("fa-inverse", toggleActive);
+    });
 
-		// Adds button to in-game options to enable paster
-		let oldWidth = $(`#qpOptionContainer`).width();
-		$(`#qpOptionContainer`).width(oldWidth + 35);
-		$(`#qpOptionContainer > div`).append(coopButton);
+    // Adds button to in-game options to enable paster
+    let oldWidth = $(`#qpOptionContainer`).width();
+    $(`#qpOptionContainer`).width(oldWidth + 35);
+    $(`#qpOptionContainer > div`).append(toggleButton);
 
-		// listener for submission
-		new Listener("quiz answer", answerHandler).bindListener();
+    // listener for submission
+    new Listener("quiz answer", answerHandler).bindListener();
 
-		// clear last answer upon new song
-		new Listener("answer results", () => { lastAnswer = ""; }).bindListener();
+    // clear last answer upon new song
+    new Listener("answer results", () => lastAnswer = "").bindListener();
 
-		// enter answers that are pasted
-		new Listener("game chat message", messageHandler).bindListener();
-		new Listener("game chat update", (payload) => {
-			payload.messages.forEach(message => messageHandler(message));
-		}).bindListener();
+    // enter answers that are pasted
+    new Listener("game chat message", messageHandler).bindListener();
+    new Listener("game chat update", (payload) => {
+      payload.messages.forEach(message => messageHandler(message));
+    }).bindListener();
 
-		AMQ_addScriptData({
-			name: "Co-op Autopaste",
-			author: "ayyu",
-			description: `
-				<p>Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.</p>
-				<p>Adds toggleable button in-game <i aria-hidden="true" class="fa fa-clipboard"></i></p>
-			`});
+    AMQ_addScriptData({
+      name: "Co-op Autopaste",
+      author: "ayyu",
+      description:
+        `<p>Automatically pastes your submitted answer to chat.
+        Also copies other people's submitted answers.</p>
+        <p>Adds toggleable button in-game:
+        <i aria-hidden="true" class="fa ${faIcon}"></i></p>`
+    });
 
-		AMQ_addStyle(`#qpCoopButton {
-			width: 30px;
-			height: 100%;
-			margin-right: 5px;
-		}`);
-	}
+    AMQ_addStyle(`#${toggleButtonID} {
+      width: 30px;
+      height: 100%;
+      margin-right: 5px;
+    }`);
+  }
 })();

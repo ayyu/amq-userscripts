@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name       	  AMQ Autocase
+// @name       	  AMQ Auto Case
 // @namespace  	  https://github.com/ayyu/
-// @version    	  1.3.1
+// @version    	  1.3.2
 // @description	  Changes your answer to lowercase so you can pretend you didn't use dropdown, or alternate casing to troll.
 // @author     	  ayyu
 // @match      	  https://animemusicquiz.com/*
@@ -18,90 +18,95 @@
 			clearInterval(loadInterval);
 		}
 	}, 500);
-	
+
+	const joinEvents = [
+		'quiz ready',
+		'Rejoining Player',
+	];
+
+	const toggleStates = [
+		{
+			'name': 'off',
+			'faIcon': 'fa-font',
+			'callback': input => input,
+		},
+		{
+			'name': 'lowercase',
+			'faIcon': 'fa-wheelchair',
+			'callback': input => input.toLowerCase(),
+		},
+		{
+			'name': 'alternate case',
+			'faIcon': 'fa-wheelchair-alt',
+			'callback': input => input.replace(
+				/[a-z]/gi,
+				c => c[`to${(answer = !answer) ? 'Upp' : 'Low'}erCase`]()
+			),
+		}
+	];
+
+	let currState = 0;
+
 	// too lazy to handle toggling in a better way
 	// at least it's better than having 2 separate buttons
-	let button;
-	let toggleState = "none";
-	// states: none lower alternate
-
-	let msg;
-	
-	function quizJoinHandler(data) {
-		quiz.answerInput.$input.off("keypress", answerHandler)
-		.on("keypress", answerHandler);
-	}
+	const toggleButtonID = 'qpCaseToggleButton';
+	const toggleButton = $(
+		`<div id="${toggleButtonID}" class="clickAble qpOption">
+			<i aria-hidden="true" class="fa ${toggleStates[currState]['faIcon']} qpMenuItem"></i>
+		</div>`
+	);
 	
 	function answerHandler(event) {
-		var answer = quiz.answerInput.$input.val();
-		if (event.which === 13) { // enter key
-			switch (toggleState) {
-				case "lower":
-					quiz.answerInput.setNewAnswer(answer.toLowerCase());
-					break;
-				case "alternate":
-					quiz.answerInput.setNewAnswer(
-						answer.replace(/[a-z]/gi, c => c[`to${(answer = !answer) ? 'Upp' : 'Low'}erCase`]())
-					);
-			}
-		}
+		if (event.which !== 13
+				|| currState == 0) return;
+		quiz.answerInput.setNewAnswer(
+			toggleStates[currState].callback(quiz.answerInput.$input.val())
+		);
 	}
 	
 	function toggle() {
-		$(`#qpCaseButton i`).removeClass("fa-font fa-wheelchair fa-wheelchair-alt");
-		switch (toggleState) {
-			case "none":
-				msg = "Enabled auto lowercase";
-				toggleState = "lower";
-				$(`#qpCaseButton i`).addClass("fa-wheelchair fa-inverse");
-				break;
-			case "lower":
-				msg = "Enabled auto alternate case";
-				toggleState = "alternate";
-				$(`#qpCaseButton i`).addClass("fa-wheelchair-alt fa-inverse");
-				break;
-			case "alternate":
-				msg = "Disabled auto case";
-				$(`#qpCaseButton i`).addClass("fa-font");
-				$(`#qpCaseButton i`).removeClass("fa-inverse");
-				toggleState = "none";
-		}
-		gameChat.systemMessage(msg);
+		toggleStates.forEach(state => {
+			$(`#${toggleButtonID} i`).removeClass(state['faIcon']);
+		});
+		currState = (currState + 1) % toggleStates.length;
+		var state = toggleStates[currState];
+		$(`#${toggleButtonID} i`).addClass(state['faIcon']);
+		gameChat.systemMessage(`Toggled autocase to ${state['name']}`);
 	}
 	
 	function setup() {
-		button = $(`<div id="qpCaseButton" class="clickAble qpOption"><i aria-hidden="true" class="fa fa-font qpMenuItem"></i></div>`);
-		button.popover({
+		toggleButton.popover({
 			placement: "bottom",
 			content: "Toggle automatic casing",
 			trigger: "hover"
 		});
-		button.click(toggle);
+		toggleButton.click(toggle);
 		
-		// Adds button to in-game options to enable paster
 		let oldWidth = $("#qpOptionContainer").width();
 		$("#qpOptionContainer").width(oldWidth + 35);
-		$("#qpOptionContainer > div").append(button);
+		$("#qpOptionContainer > div").append(toggleButton);
 		
 		// add Enter key listener for copypasta
-		new Listener("quiz ready", (data) => {
-			quizJoinHandler(data);
-		}).bindListener();
-		new Listener("Rejoining Player", (data) => {
-			quizJoinHandler(data);
-		}).bindListener();
+		joinEvents.forEach(event => {
+			new Listener(event, () => {
+				quiz.answerInput.$input
+					.off("keypress", answerHandler)
+					.on("keypress", answerHandler);
+			}).bindListener();
+		});
 	
 		AMQ_addScriptData({
 			name: "Autocase",
 			author: "ayyu",
-			description: `
-				<p>Changes your answer to upper/lowercase so you can pretend you didn't use dropdown, or alternate casing to troll.</p>
-				<p>Adds toggleable button in-game <i aria-hidden="true" class="fa fa-font"></i></p>
-			`
+			description:
+				`<p>Changes your answer to lowercase to pretend you didn't use dropdown,
+				or alternate casing to troll.</p>
+				<p>Adds toggleable button in-game:
+				<i aria-hidden="true" class="fa ${toggleStates[0]['faIcon']}"></i></p>`
 		});
 	
 		AMQ_addStyle(`
-		#qpCaseButton {
+		#${toggleButtonID} {
 			width: 30px;
 			height: 100%;
 			margin-right: 5px;
