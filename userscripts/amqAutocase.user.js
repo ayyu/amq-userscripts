@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       	  AMQ Auto Case
 // @namespace  	  https://github.com/ayyu/
-// @version    	  1.3.2
+// @version    	  1.3.3
 // @description	  Changes your answer to lowercase so you can pretend you didn't use dropdown, or alternate casing to troll.
 // @author     	  ayyu
 // @match      	  https://animemusicquiz.com/*
@@ -70,6 +70,7 @@
     });
     currState = (currState + 1) % toggleStates.length;
     var state = toggleStates[currState];
+    $(`#${toggleButtonID} i`).toggleClass("fa-inverse", currState > 0);
     $(`#${toggleButtonID} i`).addClass(state['faIcon']);
     gameChat.systemMessage(`Toggled autocase to ${state['name']}`);
   }
