@@ -12,12 +12,12 @@
 
 (() => {
   if (document.getElementById('startPage')) return;
-	let loadInterval = setInterval(() => {
-		if (document.getElementById("loadingScreen").classList.contains("hidden")) {
-			setup();
-			clearInterval(loadInterval);
-		}
-	}, 500);
+  let loadInterval = setInterval(() => {
+    if (document.getElementById("loadingScreen").classList.contains("hidden")) {
+      setup();
+      clearInterval(loadInterval);
+    }
+  }, 500);
 
   // knuth
   function shuffleArray(array) {
