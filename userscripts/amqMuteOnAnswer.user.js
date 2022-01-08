@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Mute on Answer
 // @namespace     https://github.com/ayyu/amq-scripts
-// @version       1.0.2
+// @version       1.0.3
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
 // @grant         none
@@ -18,8 +18,13 @@
     }
   }, 500);
   
-  const answerEvent = "quiz answer";
-  const nextSongEvent = "play next song";
+  const muteEvents = [
+    'quiz answer',
+    'guess phase over',
+  ];
+  const unmuteEvents = [
+    'play next song',
+  ];
 
   const toggleButtonID = 'qpMuteAnswerButton';
   const faIcon = 'fa-bath';
@@ -53,8 +58,12 @@
     $(`#qpOptionContainer`).width($(`#qpOptionContainer`).width() + 35);
     $(`#qpOptionContainer > div`).append(toggleButton);
 
-    new Listener(answerEvent, () => adjustMuted(true)).bindListener();
-    new Listener(nextSongEvent, () => adjustMuted(false)).bindListener();
+    muteEvents.forEach(event => {
+      new Listener(event, () => adjustMuted(true)).bindListener();
+    });
+    unmuteEvents.forEach(event => {
+      new Listener(event, () => adjustMuted(false)).bindListener();
+    });
     
     AMQ_addScriptData({
       name: "Mute on Answer",
