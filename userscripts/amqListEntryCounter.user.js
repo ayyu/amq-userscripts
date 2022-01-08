@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       	  AMQ List Entry Counter
 // @namespace  	  https://github.com/ayyu/
-// @version    	  0.1
+// @version    	  0.2
 // @description	  Counts the number of unique entries in your list with songs.
 // @description	  Does not send anything to spreadsheet, unlike Joseph's script.
 // @author     	  ayyu
@@ -12,7 +12,7 @@
 // ==/UserScript==
 
 (() => {
-  const yearsRange = [1944, 2022];
+  let yearsRange = [1944, 2022];
   const seasons = [0, 1, 2, 3];
 
   let counting = false;
@@ -89,22 +89,22 @@
     // 100 watched
     hostModal.numberOfSongsSliderCombo.setValue(100);
     hostModal.watchedSliderCombo.setValue(100);
-    // all diff
-    hostModal.songDiffAdvancedSwitch.setOn(true);
-    hostModal.songDiffRangeSliderCombo.setValue([0, 100]);
+    // don't change difficulties
+    /*hostModal.songDiffAdvancedSwitch.setOn(true);
+    hostModal.songDiffRangeSliderCombo.setValue([0, 100]);*/
     // 5s + vote skip
     hostModal.playLengthSliderCombo.setValue(5);
     options.$AUTO_VOTE_REPLAY.prop("checked", true);
     options.updateAutoVoteSkipReplay();
-    // all song types
-    checkboxOn(hostModal.$songTypeOpening);
+    // don't change song types
+    /*checkboxOn(hostModal.$songTypeOpening);
     checkboxOn(hostModal.$songTypeEnding);
-    checkboxOn(hostModal.$songTypeInsert);
+    checkboxOn(hostModal.$songTypeInsert);*/
     // dupes off
     checkboxOff(hostModal.$duplicateShows);
-    // rbs + dubs on
-    checkboxOn(hostModal.$rebroadcastSongs);
-    checkboxOn(hostModal.$dubSongs);
+    // don't change rb/dub
+    /* checkboxOn(hostModal.$rebroadcastSongs);
+    checkboxOn(hostModal.$dubSongs); */
   }
 
   function startGame() {
@@ -112,7 +112,7 @@
     $("#lbStartButton").click();
   }
 
-  function startCounting(startYear, startSeason) {
+  function startCounting() {
     if (!lobby.soloMode || !lobby.inLobby) {
       displayMessage("Error", "Must be in solo mode");
       return;
@@ -132,8 +132,10 @@
     quizOverListener.bindListener();
     settingsChangeListener.bindListener();
 
-    currYear = startYear;
-    currSeason = startSeason;
+    
+    initializeCount();
+    currYear = yearsRange[0];
+    currSeason = 0;
 
     setDate(currYear, currSeason);
     setSettings();
@@ -161,6 +163,7 @@
     
     counting = false;
 
+    setTimeout(() => hostModal.vintageRangeSliderCombo.setValue(yearsRange), 500);
     gameChat.systemMessage("Counter stopped");
     total = 0;
     for (const year in count) {
@@ -169,11 +172,24 @@
       }
     }
     gameChat.systemMessage(`Total entries: ${total}`);
+    exportJSON();
     console.log(count);
-    clearCountData();
   }
 
-  function clearCountData() {
+  function exportJSON() {
+    let filename = `entry_counter_${selfName}.json`;
+    let JSONData =  new Blob(
+      [JSON.stringify(count)],
+      {type: "application/json"}
+    );
+    let tmpLink = $(`<a href="${URL.createObjectURL(JSONData)}" download="${filename}"></a>`);
+    $(document.body).append(tmpLink);
+    tmpLink.get(0).click();
+    tmpLink.remove();
+  }
+
+  function initializeCount() {
+    yearsRange = hostModal.vintageRangeSliderCombo.getValue();
     for (i = yearsRange[0]; i <= yearsRange[1]; i++) {
       count[i] = {};
     }
@@ -218,7 +234,7 @@
       });
     });
 
-    playNextSongListener = new Listener("play next song", payload => {
+    playNextSongListener = new Listener("play next song", () => {
       // 500 ms delay because race conditions
       setTimeout(() => quiz.skipClicked(), 500);
     });
@@ -307,13 +323,12 @@
 
     $("#lobbyPage .menuBar").append(buttonHTML);
     buttonHTML.click(() => {
-      clearCountData();
-      startCounting(yearsRange[0], 0);
+      startCounting();
     });
 
     AMQ_addStyle(`
       #${buttonID} {
-        width: 150px;
+        width: 170px;
         left: 25%;
       }
       #${stopID} {
