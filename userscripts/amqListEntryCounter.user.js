@@ -295,7 +295,7 @@
       .html(`<i aria-hidden="true" class="fa fa-ban qpMenuItem"></i>`)
       .click(() => { if (counting) stopCounting(); })
       .popover({
-        content: "Stop Counting Entrise",
+        content: "Stop Counting Entries",
         trigger: "hover",
         placement: "bottom"
       })
