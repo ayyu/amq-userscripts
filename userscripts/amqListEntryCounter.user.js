@@ -139,6 +139,10 @@
     setSettings();
 
     lobby.changeGameSettings();
+
+    volumeController.setMuted(true);
+    volumeController.adjustVolume();
+    qualityController.newResolution(0);
   }
 
   function stopCounting() {
