@@ -114,14 +114,9 @@
     }
   }, 500);
 
-  let auto_ready = Cookies.get('auto_ready');
-  if (auto_ready != undefined) {
-    localStorage.setItem('auto_ready', auto_ready);
-    Cookies.set('auto_ready', '', { expires: 0 });
-  }
   let toggles = {
     'auto skip': false,
-    'auto ready': localStorage.getItem('auto_ready') == "true",
+    'auto ready': localStorage.getItem('auto ready') == "true",
   }
 
   // socket functions
@@ -206,6 +201,7 @@
 
   function toggle(prop) {
     toggles[prop] = !toggles[prop];
+    localStorage.setItem(prop, toggles[prop]);
     gameChat.systemMessage(
       (toggles[prop] ? "Enabled" : "Disabled") + ` ${prop}.`
     );
