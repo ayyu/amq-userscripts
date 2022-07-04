@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        	AMQ Spy Host
 // @namespace   	https://github.com/ayyu/
-// @version     	0.1
+// @version     	0.2
 // @description 	Hosts spies mode. Use /host_spies to start it and /end_spies to stop it.
 // @author      	ayyu
 // @match       	https://animemusicquiz.com/*
@@ -17,6 +17,20 @@ let loadInterval = setInterval(() => {
     clearInterval(loadInterval);
   }
 }, 500);
+
+let active = false;
+let ongoing = false;
+const spies = [];
+
+const minPlayers = 4;
+const startCountdown = 30;
+const ongoingCountdown = 10;
+let countdown;
+let lobbyInterval;
+
+const delay = 750;
+
+const pastebin = 'https://pastebin.com/Q1Z35czX';
 
 class Spy {
   constructor(player, target = null) {
@@ -53,7 +67,7 @@ function messageTargets() {
           command: "chat message",
           data: { target: assassin.name, message: `Your target is ${target.name}.` }
         });
-      }, 1000*i, spy.player, spy.target);
+      }, delay*i, spy.player, spy.target);
   });
 }
 
@@ -63,10 +77,12 @@ function startGame() {
     type: 'lobby',
     command: 'start game'
   });
+}
+
+function gameStarting(data) {
+  clearInterval(lobbyInterval);
   ongoing = true;
-  for (const key in lobby.players) {
-    spies.push(new Spy(lobby.players[key]));
-  }
+  for (const key in data.players) spies.push(new Spy(data.players[key]));
   assignTargets();
   messageTargets();
 }
@@ -106,6 +122,7 @@ function answerResults(results) {
       sendLobbyMessage(`${target.player.name} :gun: ${assassin.player.name}`);
     }
   }
+
   if (killCount === 0) sendLobbyMessage(`Nobody died.`);
   sendLobbyMessage(formatDeadSpies());
 }
@@ -146,9 +163,11 @@ function quizOver() {
   if (ongoing) {
     sendLobbyMessage(`The game will continue with the remaining players.`);
     countdown = ongoingCountdown;
-    spies.forEach(spy => {
-      if (!spy.alive) movePlayerToSpec(spy.player.name);
-    })
+    const deadSpies = spies.filter(spy => !spy.alive);
+    deadSpies.forEach((spy, i) => {
+      setTimeout(movePlayerToSpec, delay*i, spy.player.name);
+    });
+    spies.length = 0;
   } else {
     sendLobbyMessage(`A new Spy vs. Spy game is starting. Players may now join.`);
     countdown = startCountdown;
@@ -183,18 +202,6 @@ function filterSortAliveResults(aliveSpies, quizResults) {
   aliveResults.sort((a, b) => a.endPosition - b.endPosition);
   return aliveResults;
 }
-
-let active = false;
-let ongoing = false;
-const spies = [];
-
-const minPlayers = 4;
-const startCountdown = 30;
-const ongoingCountdown = 10;
-let countdown;
-let lobbyInterval;
-
-const pastebin = 'https://pastebin.com/Q1Z35czX';
 
 function processChatCommand(payload) {
   if (payload.sender !== selfName
@@ -290,6 +297,7 @@ function setup() {
   new Listener("New Player", playerJoined).bindListener();
   new Listener("New Spectator", specJoined).bindListener();
   new Listener("Spectator Change To Player", specToPlayer).bindListener();
+  new Listener("Game Starting", gameStarting).bindListener();
   new Listener("answer results", answerResults).bindListener();
   new Listener("quiz end result", quizEndResult).bindListener();
   new Listener("quiz over", quizOver).bindListener();
