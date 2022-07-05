@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        	AMQ Spy Host
 // @namespace   	https://github.com/ayyu/
-// @version     	0.2
+// @version     	0.3
 // @description 	Hosts spies mode. Use /host_spies to start it and /end_spies to stop it.
 // @author      	ayyu
 // @match       	https://animemusicquiz.com/*
@@ -24,11 +24,11 @@ const spies = [];
 
 const minPlayers = 4;
 const startCountdown = 30;
-const ongoingCountdown = 10;
+const ongoingCountdown = 15;
 let countdown;
 let lobbyInterval;
 
-const delay = 750;
+const delay = 500;
 
 const pastebin = 'https://pastebin.com/Q1Z35czX';
 
@@ -80,6 +80,7 @@ function startGame() {
 }
 
 function gameStarting(data) {
+  if (!active) return;
   clearInterval(lobbyInterval);
   ongoing = true;
   for (const key in data.players) spies.push(new Spy(data.players[key]));
@@ -90,11 +91,11 @@ function gameStarting(data) {
 function lobbyTick() {
   if (!active || !lobby.isHost ||  (!quiz.inQuiz && !lobby.inLobby)) return;
   if (lobby.numberOfPlayersReady >= minPlayers) {
-    if (countdown === 0) {
+    if (countdown < 1) {
       startGame();
     } else {
       if (countdown % 10 == 0 || countdown <= 5) {
-        sendLobbyMessage(`Spies will be starting in ${countdown} seconds`);
+        sendLobbyMessage(`The next game will start in ${countdown} seconds.`);
       }
       countdown--;
     }
@@ -124,7 +125,8 @@ function answerResults(results) {
   }
 
   if (killCount === 0) sendLobbyMessage(`Nobody died.`);
-  sendLobbyMessage(formatDeadSpies());
+  const deadSpies = spies.filter(spy => !spy.alive);
+  sendLobbyMessage(formatDeadSpies(deadSpies));
 }
 
 function quizEndResult(results) {
@@ -138,7 +140,7 @@ function quizEndResult(results) {
   let aliveSpies = spies.filter(spy => spy.alive);
   if (checkWinners(aliveSpies, results)) return;
 
-  const losers = getLosers(aliveSpies, results);
+  const losers = getEndPosition(aliveSpies, results, false);
   losers.forEach(loser => {
     loser.alive = false;
     sendLobbyMessage(`${loser.player.name} has died for being in last place.`);
@@ -150,7 +152,7 @@ function quizEndResult(results) {
 
 function checkWinners(aliveSpies, quizResults) {
   if (aliveSpies.length < minPlayers) {
-    const winners = getWinners(aliveSpies, quizResults);
+    const winners = getEndPosition(aliveSpies, quizResults, true);
     sendLobbyMessage(formatWinners(winners));
     ongoing = false;
     return true;
@@ -176,24 +178,14 @@ function quizOver() {
   lobbyInterval = setInterval(lobbyTick, 1000);
 }
 
-function getWinners(aliveSpies, quizResults) {
+function getEndPosition(aliveSpies, quizResults, first = true) {
   if (aliveSpies.length == 0) return [];
   const aliveResults = filterSortAliveResults(aliveSpies, quizResults);
-  const firstPosition = aliveResults[0].endPosition;
-  const winningIds = aliveResults
-    .filter((result) => result.endPosition == firstPosition)
+  const endPosition = aliveResults[first ? 0 : aliveResults.length - 1].endPosition;
+  const matchingIds = aliveResults
+    .filter((result) => result.endPosition == endPosition)
     .map((result) => result.gamePlayerId);
-  return aliveSpies.filter(spy => winningIds.includes(spy.player.gamePlayerId));
-}
-
-function getLosers(aliveSpies, quizResults) {
-  if (aliveSpies.length == 0) return [];
-  const aliveResults = filterSortAliveResults(aliveSpies, quizResults);
-  const lastPosition = aliveResults[aliveResults.length - 1].endPosition;
-  const losingIds = aliveResults
-    .filter((result) => result.endPosition == lastPosition)
-    .map((result) => result.gamePlayerId);
-    return aliveSpies.filter(spy => losingIds.includes(spy.player.gamePlayerId));
+    return aliveSpies.filter(spy => matchingIds.includes(spy.player.gamePlayerId));
 }
 
 function filterSortAliveResults(aliveSpies, quizResults) {
@@ -229,32 +221,23 @@ function processChatCommand(payload) {
 
 function formatWinners(winners) {
   let msg = `The game has ended. `;
-  if (winners.length == 0) {
-    msg += 'Everyone died.';
-  } else {
-    msg += ':trophy: ' + winners.map(spy => spy.player.name).join(', ');
-  }
+  msg += winners.length ? ':trophy: ' + winners.map(spy => spy.player.name).join(', ') : 'Everyone died.';
   return msg;
 }
 
-function formatDeadSpies() {
+function formatDeadSpies(deadSpies) {
   let msg = ":skull:: ";
-  const deadSpies = spies.filter(spy => !spy.alive);
-  if (deadSpies.length == 0) {
-    msg += ":egg:";
-  } else {
-    msg += deadSpies.map(spy => spy.player.name).join(', ');
-  }
+  msg += deadSpies.length ? deadSpies.map(spy => spy.player.name).join(', ') : ":egg:";
   return msg;
 }
 
 function playerJoined(player) {
-  if (ongoing) blockPlayerJoin(player);
+  if (active && ongoing) blockPlayerJoin(player);
   joinMessage(player);
 }
 
 function specToPlayer(player) {
-  if (ongoing) blockPlayerJoin(player);
+  if (active && ongoing) blockPlayerJoin(player);
 }
 
 function blockPlayerJoin(player) {
