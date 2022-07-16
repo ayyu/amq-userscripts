@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        	AMQ Spy Host
 // @namespace   	https://github.com/ayyu/
-// @version     	0.3
+// @version     	0.4
 // @description 	Hosts spies mode. Use /host_spies to start it and /end_spies to stop it.
 // @author      	ayyu
 // @match       	https://animemusicquiz.com/*
