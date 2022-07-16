@@ -27,6 +27,7 @@ const startCountdown = 30;
 const ongoingCountdown = 15;
 let countdown;
 let lobbyInterval;
+let readyDelayed;
 
 const delay = 500;
 
@@ -59,19 +60,19 @@ function assignTargets() {
 }
 
 function messageTargets() {
-  spies.forEach((spy, i) => {
-    setTimeout(
-      (assassin, target) => {
-        socket.sendCommand({
-          type: "social",
-          command: "chat message",
-          data: { target: assassin.name, message: `Your target is ${target.name}.` }
-        });
-      }, delay*i, spy.player, spy.target);
+  spies.forEach((spy, i) => setTimeout(messageTarget, delay*i, spy.player, spy.target));
+}
+
+function messageTarget(assassin, target) {
+  socket.sendCommand({
+    type: "social",
+    command: "chat message",
+    data: { target: assassin.name, message: `Your target is ${target.name}.` }
   });
 }
 
 function startGame() {
+  readyDelayed = false;
   clearInterval(lobbyInterval);
   socket.sendCommand({
     type: 'lobby',
@@ -92,6 +93,14 @@ function lobbyTick() {
   if (!active || !lobby.isHost ||  (!quiz.inQuiz && !lobby.inLobby)) return;
   if (lobby.numberOfPlayersReady >= minPlayers) {
     if (countdown < 1) {
+      if (!readyDelayed) {
+        readyDelayed = true;
+        countdown = 5;
+        Object.keys(lobby.players)
+          .map((key) => lobby.players[key])
+          .filter((player) => !player.ready)
+          .forEach((player) => sendLobbyMessage(`@${player.name} ready up. There will be ${countdown} more seconds before the game begins.`));
+      }
       startGame();
     } else {
       if (countdown % 10 == 0 || countdown <= 5) {
@@ -99,6 +108,8 @@ function lobbyTick() {
       }
       countdown--;
     }
+  } else {
+    countdown = (ongoing) ? ongoingCountdown : startCountdown;
   }
 }
 
@@ -196,6 +207,11 @@ function filterSortAliveResults(aliveSpies, quizResults) {
 }
 
 function processChatCommand(payload) {
+  if (active && payload.message.startsWith('/resend_target')) {
+    assassin = spies.find(spy => spy.player.name == payload.sender);
+    if (assassin) messageTarget(assassin.player, assassin.target);
+  }
+
   if (payload.sender !== selfName
       || !lobby.isHost
       || quiz.gameMode == 'Ranked'
