@@ -40,7 +40,7 @@ function answerResults(results) {
 function setup() {
   toggleButton.popover({
     placement: "bottom",
-    content: "Toggle co-op copy paste to chat",
+    content: "Toggle skip on correct answers only",
     trigger: "hover"
   });
   toggleButton.click(() => {
