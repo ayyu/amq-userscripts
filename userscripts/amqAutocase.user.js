@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       	  AMQ Auto Case
 // @namespace  	  https://github.com/ayyu/
-// @version    	  1.3.3
+// @version    	  1.3.4
 // @description	  Changes your answer to lowercase so you can pretend you didn't use dropdown, or alternate casing to troll.
 // @author     	  ayyu
 // @match      	  https://animemusicquiz.com/*
@@ -38,10 +38,14 @@
     {
       'name': 'alternate case',
       'faIcon': 'fa-wheelchair-alt',
-      'callback': input => input.replace(
-        /[a-z]/gi,
-        c => c[`to${(answer = !answer) ? 'Upp' : 'Low'}erCase`]()
-      ),
+      'callback': input => {
+        let autoCasedAnswer = '';
+        for(let position in input){
+          let n = input[position].charCodeAt();
+          autoCasedAnswer += input[position].replace(input[position], position % 2 == 0 ? input[position].toLowerCase() : input[position].toUpperCase());
+        };
+        return autoCasedAnswer;
+      },
     }
   ];
 
@@ -59,8 +63,8 @@
   function answerHandler(event) {
     if (event.which !== 13
         || currState == 0) return;
-    quiz.answerInput.setNewAnswer(
-      toggleStates[currState].callback(quiz.answerInput.$input.val())
+    quiz.answerInput.typingInput.setNewAnswer(
+      toggleStates[currState].callback(quiz.answerInput.typingInput.$input.val())
     );
   }
   
@@ -90,7 +94,7 @@
     // add Enter key listener for copypasta
     joinEvents.forEach(event => {
       new Listener(event, () => {
-        quiz.answerInput.$input
+        quiz.answerInput.typingInput.$input
           .off("keypress", answerHandler)
           .on("keypress", answerHandler);
       }).bindListener();
