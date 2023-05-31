@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        	AMQ Co-op Autopaste
 // @namespace   	https://github.com/ayyu/
-// @version     	2.4.3
+// @version     	2.4.4
 // @description 	Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.
 // @author      	ayyu
 // @match       	https://animemusicquiz.com/*
@@ -63,9 +63,9 @@
         || payload.sender == selfName
         || !rePrefix.test(payload.message)) return;
     answer = payload.message.replace(rePrefix, '');
-    if (!ciCompare(quiz.answerInput.quizAnswerState.submittedAnswer, answer)) {
+    if (!ciCompare(quiz.answerInput.typingInput.quizAnswerState.submittedAnswer, answer)) {
       pasted = true;
-      quiz.answerInput.setNewAnswer(answer);
+      quiz.answerInput.typingInput.setNewAnswer(answer);
     }
   }
 
