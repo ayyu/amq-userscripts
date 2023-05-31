@@ -63,9 +63,9 @@
         || payload.sender == selfName
         || !rePrefix.test(payload.message)) return;
     answer = payload.message.replace(rePrefix, '');
-    if (!ciCompare(quiz.answerInput.quizAnswerState.submittedAnswer, answer)) {
+    if (!ciCompare(quiz.answerInput.typingInput.quizAnswerState.submittedAnswer, answer)) {
       pasted = true;
-      quiz.answerInput.setNewAnswer(answer);
+      quiz.answerInput.typingInput.setNewAnswer(answer);
     }
   }
 
