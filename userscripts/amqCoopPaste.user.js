@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        	AMQ Co-op Autopaste
 // @namespace   	https://github.com/ayyu/
-// @version     	2.4.4
+// @version     	2.4.5
 // @description 	Automatically pastes your submitted answer to chat. Also copies other people's submitted answers.
 // @author      	ayyu
 // @match       	https://animemusicquiz.com/*
@@ -92,7 +92,11 @@
     new Listener("quiz answer", answerHandler).bindListener();
 
     // clear last answer upon new song
-    new Listener("answer results", () => lastAnswer = "").bindListener();
+    // reset the pasted flag back to false to allow someone else to publish answer on a new song.
+    new Listener("answer results", () =>{
+        lastAnswer = "";
+        pasted = false;
+    }).bindListener();
 
     // enter answers that are pasted
     new Listener("game chat message", messageHandler).bindListener();
