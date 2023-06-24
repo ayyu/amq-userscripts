@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        	AMQ Spy Host
 // @namespace   	https://github.com/ayyu/
-// @version     	0.4
+// @version     	0.5
 // @description 	Hosts spies mode. Use /host_spies to start it and /end_spies to stop it.
 // @author      	ayyu
 // @match       	https://animemusicquiz.com/*
@@ -117,7 +117,7 @@ function answerResults(results) {
   if (!active) return;
   
   const pickerIds = results.players
-    .filter(player => player.listStatus != null)
+    .filter(player => player.looted)
     .map(player => player.gamePlayerId);
   const correctIds = results.players
     .filter(player => player.correct)
