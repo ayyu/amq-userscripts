@@ -1,23 +1,36 @@
 // ==UserScript==
 // @name            AMQ Spy Host
 // @namespace       https://github.com/ayyu/
-// @version         0.5
-// @description     Hosts spies mode. Use /host_spies to start it and /end_spies to stop it.
+// @version         0.6
+// @description     Host Spy Vs. Spy game mode. See commands with /spy
 // @author          ayyu
 // @match           https://animemusicquiz.com/*
 // @grant           none
-// @require         https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
+// @require         https://raw.githubusercontent.com/joske2865/AMQ-Scripts/master/common/amqScriptInfo.js
 // @downloadURL     https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js
+// @updateURL       https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js
 // ==/UserScript==
 
-if (document.getElementById("startPage")) return;
+/*
+Commands:
+/spy            see all /spy commands
+/spy start      start game
+/spy stop       stop  game
+/spy settings   change room settings for spy game mode
+/spy rules      send pastebin for rules
+/spy resend     ask the host to resend your target
+*/
+
+"use strict";
+if (typeof Listener === "undefined") return;
 let loadInterval = setInterval(() => {
-    if (document.getElementById("loadingScreen").classList.contains("hidden")) {
-        setup();
+    if ($("#loadingScreen").hasClass("hidden")) {
         clearInterval(loadInterval);
+        setup();
     }
 }, 500);
 
+const version = "0.6";
 let active = false;
 let ongoing = false;
 const spies = [];
@@ -298,3 +311,11 @@ function setup() {
     new Listener("quiz end result", quizEndResult).bindListener();
     new Listener("quiz over", quizOver).bindListener();
 }
+
+AMQ_addScriptData({
+    name: "Spy Host",
+    author: "ayyu",
+    version: version,
+    link: "https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js",
+    description: `<p>Host spy mode. See commands with /spy</p>`
+});
