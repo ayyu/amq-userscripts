@@ -31,17 +31,17 @@ let loadInterval = setInterval(() => {
 }, 500);
 
 const version = "0.6";
+const pastebin = "https://pastebin.com/Q1Z35czX";
+let minPlayers = 4;
+let startCountdown = 30;
+let ongoingCountdown = 15;
+let delay = 500;
 let active = false;
 let ongoing = false;
-const spies = [];
-const minPlayers = 4;
-const startCountdown = 30;
-const ongoingCountdown = 15;
+let spies = [];
 let countdown;
 let lobbyInterval;
 let readyDelayed;
-const delay = 500;
-const pastebin = "https://pastebin.com/Q1Z35czX";
 
 class Spy {
     constructor(player, target = null) {
@@ -56,14 +56,14 @@ class Spy {
 // knuth
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        let j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
 }
 
 function assignTargets() {
     shuffleArray(spies);
-    const numSpies = spies.length;
+    let numSpies = spies.length;
     for (let i = 0; i < numSpies; i++) {
         spies[i].target = spies[(i + 1) % numSpies].player;
     }
@@ -94,7 +94,7 @@ function gameStarting(data) {
     if (!active) return;
     clearInterval(lobbyInterval);
     ongoing = true;
-    for (const key in data.players) spies.push(new Spy(data.players[key]));
+    for (let key in data.players) spies.push(new Spy(data.players[key]));
     assignTargets();
     messageTargets();
 }
@@ -126,15 +126,15 @@ function lobbyTick() {
 function answerResults(results) {
     if (!active) return;
     
-    const pickerIds = results.players
+    let pickerIds = results.players
         .filter(player => player.looted)
         .map(player => player.gamePlayerId);
-    const correctIds = results.players
+    let correctIds = results.players
         .filter(player => player.correct)
         .map(player => player.gamePlayerId);
     
     let killCount = 0;
-    for (const pickerId of pickerIds) {
+    for (let pickerId of pickerIds) {
         let assassin = spies.find(spy => spy.player.gamePlayerId == pickerId);
         assassin.rig = true;
         let target = spies.find(spy => spy.player.gamePlayerId == assassin.target.gamePlayerId);
@@ -146,7 +146,7 @@ function answerResults(results) {
     }
 
     if (killCount === 0) sendLobbyMessage(`Nobody died.`);
-    const deadSpies = spies.filter(spy => !spy.alive);
+    let deadSpies = spies.filter(spy => !spy.alive);
     sendLobbyMessage(formatDeadSpies(deadSpies));
 }
 
@@ -161,7 +161,7 @@ function quizEndResult(results) {
     let aliveSpies = spies.filter(spy => spy.alive);
     if (checkWinners(aliveSpies, results)) return;
 
-    const losers = getEndPosition(aliveSpies, results, false);
+    let losers = getEndPosition(aliveSpies, results, false);
     losers.forEach(loser => {
         loser.alive = false;
         sendLobbyMessage(`${loser.player.name} has died for being in last place.`);
@@ -173,7 +173,7 @@ function quizEndResult(results) {
 
 function checkWinners(aliveSpies, quizResults) {
     if (aliveSpies.length < minPlayers) {
-        const winners = getEndPosition(aliveSpies, quizResults, true);
+        let winners = getEndPosition(aliveSpies, quizResults, true);
         sendLobbyMessage(formatWinners(winners));
         ongoing = false;
         return true;
@@ -186,7 +186,7 @@ function quizOver() {
     if (ongoing) {
         sendLobbyMessage(`The game will continue with the remaining players.`);
         countdown = ongoingCountdown;
-        const deadSpies = spies.filter(spy => !spy.alive);
+        let deadSpies = spies.filter(spy => !spy.alive);
         deadSpies.forEach((spy, i) => {
             setTimeout(movePlayerToSpec, delay*i, spy.player.name);
         });
@@ -201,17 +201,17 @@ function quizOver() {
 
 function getEndPosition(aliveSpies, quizResults, first = true) {
     if (aliveSpies.length == 0) return [];
-    const aliveResults = filterSortAliveResults(aliveSpies, quizResults);
-    const endPosition = aliveResults[first ? 0 : aliveResults.length - 1].endPosition;
-    const matchingIds = aliveResults
+    let aliveResults = filterSortAliveResults(aliveSpies, quizResults);
+    let endPosition = aliveResults[first ? 0 : aliveResults.length - 1].endPosition;
+    let matchingIds = aliveResults
         .filter((result) => result.endPosition == endPosition)
         .map((result) => result.gamePlayerId);
         return aliveSpies.filter(spy => matchingIds.includes(spy.player.gamePlayerId));
 }
 
 function filterSortAliveResults(aliveSpies, quizResults) {
-    const aliveIds = aliveSpies.map(spy => spy.player.gamePlayerId);
-    const aliveResults = quizResults.resultStates.filter(player => aliveIds.includes(player.gamePlayerId));
+    let aliveIds = aliveSpies.map(spy => spy.player.gamePlayerId);
+    let aliveResults = quizResults.resultStates.filter(player => aliveIds.includes(player.gamePlayerId));
     aliveResults.sort((a, b) => a.endPosition - b.endPosition);
     return aliveResults;
 }
