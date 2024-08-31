@@ -2,7 +2,7 @@
 // @name          AMQ Spy Host
 // @namespace     https://github.com/ayyu/
 // @version       0.6
-// @description   Hosts spies mode. Use /host_spies to start it and /end_spies to stop it. Thank you to kempanator for settings code.
+// @description   Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
 // @grant         none
@@ -48,8 +48,35 @@ const subCommands = {
   'start': startSpiesSession,
   'stop': endSpiesSession,
   'rules': sendRulesInRoomChat,
-  'resend': messageTargets,
+  'resend': resendTargets,
   'settings': changeSpyLobbySettings,
+};
+
+const baseSettings = {
+  showSelection: quiz.SHOW_SELECTION_IDS.LOOTING,
+  inventorySize: {
+    randomOn: false,
+    standardValue: 1,
+  },
+  lootingTime: {
+    randomOn: false,
+    standardValue: 60,
+  },
+  numberOfSongs: 100,
+  songSelection: {
+    standardValue: 3,
+  },
+  songType: {
+    standardValue: {
+      openings: true,
+      endings: true,
+      inserts: true,
+    },
+  },
+  scoreType: 1,
+  modifiers: {
+    duplicates: false,
+  }
 };
 
 class Spy {
@@ -164,6 +191,10 @@ function answerResults(results) {
 function quizEndResult(results) {
   if (!isGameHost()) return;
 
+  // reveal targets
+  sendHostingMessage(`Targets:`);
+  spies.forEach(spy => {sendHostingMessage(`${spy.player.name} > ${spy.target.player.name}`)});
+
   let aliveSpies = spies.filter(spy => spy.alive);
 
   // kill all players who failed to loot a show
@@ -175,7 +206,10 @@ function quizEndResult(results) {
   // check for a winner before killing any further players
   aliveSpies = spies.filter(spy => spy.alive);
   let winners = findWinners(aliveSpies, results);
-  if (winners !== false) endGame(winners);
+  if (winners !== false) {
+    endGame(winners);
+    return
+  }
 
   // kill last place
   const aliveResultStates = filterQuizResultStatesBySpies(aliveSpies, results.resultStates);
@@ -189,7 +223,10 @@ function quizEndResult(results) {
   // check for winners again
   aliveSpies = spies.filter(spy => spy.alive);
   winners = findWinners(aliveSpies, results);
-  if (winners !== false) endGame(winners);
+  if (winners !== false) {
+    endGame(winners);
+    return;
+  }
 }
 
 function findWinners(aliveSpies, results) {
@@ -204,7 +241,6 @@ function findWinners(aliveSpies, results) {
 
 function endGame(winners) {
   sendHostingMessage(`The game has ended. ${winners.length ? ':trophy: ' + winners.map(spy => spy.player.name).join(', ') : 'Everyone died.'}`);
-  // TODO: send message of chain of targets
   continuing = false;
 }
 
@@ -293,35 +329,12 @@ function changeSpyLobbySettings() {
     gameChat.systemMessage('You must be the lobby host to change settings.');
     return;
   }
+  hostModal.changeSettings(baseSettings);
+  setTimeout(() => {lobby.changeGameSettings()}, 1);
+}
 
-  const settings = {
-    showSelection: quiz.SHOW_SELECTION_IDS.LOOTING,
-    inventorySize: {
-      randomOn: false,
-      standardValue: 1,
-    },
-    lootingTime: {
-      randomOn: false,
-      standardValue: 60,
-    },
-    numberOfSongs: 100,
-    songSelection: {
-      standardValue: 3,
-    },
-    songType: {
-      standardValue: {
-        openings: true,
-        endings: true,
-        inserts: true,
-      },
-    },
-    scoreType: 1,
-    modifiers: {
-      duplicates: false,
-    }
-  };
-  hostModal.changeSettings(settings);
-  setTimeout(lobby.changeGameSettings, 1);
+function resendTargets() {
+  messageTargets(spies);
 }
 
 function helpMessage() {
@@ -330,17 +343,19 @@ function helpMessage() {
   sendRoomMessage(`Available commands: ${subcommandKeys.join(', ')}`);
 }
 
-function sendRulesInRoomChat(playerNameMention = null) {
-  sendRoomMessage(`${playerNameMention ? '@' + playerNameMention.name : ''} Spy vs. Spy game mode: ${pastebin}`);
+function sendRulesInRoomChat(mentionPlayer = null) {
+  sendRoomMessage(`${mentionPlayer ? '@' + mentionPlayer.name : ''} Spy vs. Spy game mode: ${pastebin}`);
 }
 
 function playerJoined(player) {
-  if (hosting && continuing) blockPlayerJoin(player);
+  if (!isGameHost()) return;
+  if (continuing) blockPlayerJoin(player);
   joinMessage(player);
 }
 
 function specToPlayer(player) {
-  if (hosting && continuing) blockPlayerJoin(player);
+  if (!isGameHost()) return;
+  if (continuing) blockPlayerJoin(player);
 }
 
 function blockPlayerJoin(player) {
@@ -353,7 +368,8 @@ function specJoined(player) {
 }
 
 function joinMessage(player) {
-  sendRulesInRoomChat(player.name);
+  if (!isGameHost()) return;
+  sendRulesInRoomChat(player);
 }
 
 function sendHostingMessage(message) {
