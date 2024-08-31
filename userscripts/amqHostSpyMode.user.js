@@ -1,13 +1,14 @@
 // ==UserScript==
-// @name        	AMQ Spy Host
-// @namespace   	https://github.com/ayyu/
-// @version     	0.5
-// @description 	Hosts spies mode. Use /host_spies to start it and /end_spies to stop it.
-// @author      	ayyu
-// @match       	https://animemusicquiz.com/*
-// @grant       	none
-// @require     	https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
-// @downloadURL 	https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js
+// @name          AMQ Spy Host
+// @namespace     https://github.com/ayyu/
+// @version       0.5
+// @description   Hosts spies mode. Use /host_spies to start it and /end_spies to stop it.
+// @author        ayyu
+// @match         https://animemusicquiz.com/*
+// @grant         none
+// @require       https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
+// @downloadURL   https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js
+// @updateURL     https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js
 // ==/UserScript==
 
 if (document.getElementById('startPage')) return;
@@ -18,17 +19,26 @@ let loadInterval = setInterval(() => {
   }
 }, 500);
 
+// Booleans for whether the script is active and whether there is an ongoing multi-round game
 let hosting = false;
 let continuing = false;
+
+// The minimum number of players for a game to continue is 4. With 3 players the rules become degenerate.
+const minPlayers = 4;
+// Can specify a minimum number of players before starting a fresh game.
+let initPlayers = minPlayers;
 const spies = [];
 
-const minPlayers = 4;
 const newGameInitCountdown = 30;
 const continuingGameInitCountdown = 15;
+
 let lobbyCountdown;
-let lobbyInterval;
 let readyDelayed;
 
+// ID for timer used for lobby tick
+let lobbyInterval;
+
+// milliseconds to delay between each chat message sent to the players to avoid rate limiting
 const messageDelay = 500;
 
 const pastebin = 'https://pastebin.com/Q1Z35czX';
