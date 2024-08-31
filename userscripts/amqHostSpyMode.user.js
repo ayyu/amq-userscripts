@@ -49,7 +49,7 @@ const subCommands = {
   'stop': endSpiesSession,
   'rules': sendRulesInRoomChat,
   'resend': resendTargets,
-  'settings': changeSpyLobbySettings,
+  //'settings': changeSpyLobbySettings,
 };
 
 const baseSettings = {
@@ -192,9 +192,8 @@ function quizEndResult(results) {
   if (!isGameHost()) return;
 
   // reveal targets
-  sendHostingMessage(`Targets:`);
-  spies.forEach(spy => {sendHostingMessage(`${spy.player.name} > ${spy.target.player.name}`)});
-
+  sendHostingMessage(`Targets: ${spies[0].player.name} > ${spies.map(spy => spy.target.player.name).join(' > ')}`);
+  
   let aliveSpies = spies.filter(spy => spy.alive);
 
   // kill all players who failed to loot a show
