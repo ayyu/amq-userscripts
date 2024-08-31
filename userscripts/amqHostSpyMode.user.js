@@ -87,8 +87,10 @@ function gameStarting(data) {
 
 function lobbyTick() {
   if (!hosting || !lobby.isHost ||  (!quiz.inQuiz && !lobby.inLobby)) return;
+
   // reset countdown to maximum if there aren't enough players in the lobby
   if (lobby.numberOfPlayersReady < minPlayersToStart) lobbyCountdown = (continuing) ? continuingGameInitCountdown : newGameInitCountdown;
+
   if (lobbyCountdown == 0) {
     socket.sendCommand({
       type: 'lobby',
@@ -96,13 +98,17 @@ function lobbyTick() {
     });
     return;
   }
-  if (lobbyCountdown % 10 == 0 || lobbyCountdown <= 5) sendLobbyChatMessage(`The next game will start in ${lobbyCountdown} seconds.`);
+
+  if (lobbyCountdown % 10 == 0 || lobbyCountdown <= 5) {
+    sendLobbyChatMessage(`The next game will start in ${lobbyCountdown} seconds.`);
+  }
   if (lobbyCountdown % 5 == 0) {
     Object.keys(lobby.players)
       .map((key) => lobby.players[key])
       .filter((player) => !player.ready)
       .forEach((player) => sendLobbyChatMessage(`@${player.name} ready up before the game starts.`));
   }
+
   lobbyCountdown--;
 }
 
@@ -116,7 +122,6 @@ function answerResults(results) {
     .filter(player => player.correct);
   
   const successfulAssassins = [];
-  
   for (const looter of looters) {
     const assassin = spies.find(spy => spy.player.gamePlayerId == looter.gamePlayerId);
     assassin.looted = true;
@@ -126,7 +131,7 @@ function answerResults(results) {
 
   // nobody dies if all players answer correctly to discourage picking Teekyuu
   if (correctPlayers.length == results.players.length) {
-    sendLobbyChatMessage(``);
+    sendLobbyChatMessage(`Nobody died because all players answered correctly. Pick something harder next time.`);
   } else if (successfulAssassins.length == 0) {
     sendLobbyChatMessage(`Nobody died.`);
   } else {
