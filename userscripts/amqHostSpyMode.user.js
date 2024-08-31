@@ -31,9 +31,7 @@ const spies = [];
 
 const newGameInitCountdown = 30;
 const continuingGameInitCountdown = 15;
-
 let lobbyCountdown;
-let readyDelayed;
 
 // ID for timer used for lobby tick
 let lobbyInterval;
@@ -48,7 +46,7 @@ class Spy {
     this.player = player;
     this.target = target;
     this.alive = true;
-    this.rig = false;
+    this.looted = false;
   }
 }
 
@@ -60,14 +58,14 @@ function shuffleArray(array) {
   }
 }
 
-function assignTargets() {
+function assignTargets(spies) {
   shuffleArray(spies);
   spies.forEach((spy, i, spies) => {
-    spy.target = spies[(i + 1) % spies.length].player;
+    spy.target = spies[(i + 1) % spies.length];
   });
 }
 
-function messageTargets() {
+function messageTargets(spies) {
   spies.forEach((spy, i) => setTimeout(sendTargetPrivateMessage, messageDelay*i, spy.player, spy.target));
 }
 
@@ -75,7 +73,7 @@ function sendTargetPrivateMessage(assassin, target) {
   socket.sendCommand({
     type: "social",
     command: "chat message",
-    data: { target: assassin.name, message: `Your target is ${target.name}.` }
+    data: { target: assassin.name, message: `Your target is ${target.player.name}.` }
   });
 }
 
@@ -83,8 +81,8 @@ function gameStarting(data) {
   if (!hosting) return;
   continuing = true;
   for (const key in data.players) spies.push(new Spy(data.players[key]));
-  assignTargets();
-  messageTargets();
+  assignTargets(spies);
+  messageTargets(spies);
 }
 
 function lobbyTick() {
@@ -99,44 +97,53 @@ function lobbyTick() {
     return;
   }
   if (lobbyCountdown % 10 == 0 || lobbyCountdown <= 5) sendLobbyChatMessage(`The next game will start in ${lobbyCountdown} seconds.`);
-  if (lobbyCountdown % 5 == 0) Object.keys(lobby.players)
-    .map((key) => lobby.players[key])
-    .filter((player) => !player.ready)
-    .forEach((player) => sendLobbyChatMessage(`@${player.name} ready up. There will be ${lobbyCountdown} more seconds before the game begins.`));
+  if (lobbyCountdown % 5 == 0) {
+    Object.keys(lobby.players)
+      .map((key) => lobby.players[key])
+      .filter((player) => !player.ready)
+      .forEach((player) => sendLobbyChatMessage(`@${player.name} ready up before the game starts.`));
+  }
   lobbyCountdown--;
 }
 
 function answerResults(results) {
   if (!hosting) return;
   
-  const pickerIds = results.players
+  // need to find all players that looted this entry in case multiple people looted the same entry
+  const looters = results.players
     .filter(player => player.looted)
-    .map(player => player.gamePlayerId);
-  const correctIds = results.players
-    .filter(player => player.correct)
-    .map(player => player.gamePlayerId);
+  const correctPlayers = results.players
+    .filter(player => player.correct);
   
-  let killCount = 0;
-  for (const pickerId of pickerIds) {
-    let assassin = spies.find(spy => spy.player.gamePlayerId == pickerId);
-    assassin.rig = true;
-    let target = spies.find(spy => spy.player.gamePlayerId == assassin.target.gamePlayerId);
-    if (correctIds.includes(target.player.gamePlayerId)) {
-      target.alive = false;
-      killCount++;
-      sendLobbyChatMessage(`${target.player.name} :gun: ${assassin.player.name}`);
-    }
+  const successfulAssassins = [];
+  
+  for (const looter of looters) {
+    const assassin = spies.find(spy => spy.player.gamePlayerId == looter.gamePlayerId);
+    assassin.looted = true;
+    if (correctPlayers.map(player => player.gamePlayerId).includes(assassin.target.player.gamePlayerId))
+      successfulAssassins.push(assassin);
   }
 
-  if (killCount === 0) sendLobbyChatMessage(`Nobody died.`);
+  // nobody dies if all players answer correctly to discourage picking Teekyuu
+  if (correctPlayers.length == results.players.length) {
+    sendLobbyChatMessage(``);
+  } else if (successfulAssassins.length == 0) {
+    sendLobbyChatMessage(`Nobody died.`);
+  } else {
+    successfulAssassins.forEach(assassin => {
+      assassin.target.alive = false;
+      sendLobbyChatMessage(`${assassin.target.player.name} :gun: ${assassin.player.name}`);
+    });
+  }
+
   const deadSpies = spies.filter(spy => !spy.alive);
-  sendLobbyChatMessage(formatDeadSpies(deadSpies));
+  sendLobbyChatMessage((`:skull:: ${deadSpies.length > 0 ? deadSpies.map(spy => spy.player.name).join(', ') : ":egg:"}`));
 }
 
 function quizEndResult(results) {
   if (!hosting) return;
   spies.forEach(spy => {
-    if (!spy.rig) {
+    if (!spy.looted) {
       spy.alive = false;
       sendLobbyChatMessage(`${spy.player.name} has died for not looting a show.`);
     }
@@ -231,12 +238,6 @@ function processChatCommand(payload) {
 function formatWinners(winners) {
   let msg = `The game has ended. `;
   msg += winners.length ? ':trophy: ' + winners.map(spy => spy.player.name).join(', ') : 'Everyone died.';
-  return msg;
-}
-
-function formatDeadSpies(deadSpies) {
-  let msg = ":skull:: ";
-  msg += deadSpies.length ? deadSpies.map(spy => spy.player.name).join(', ') : ":egg:";
   return msg;
 }
 
