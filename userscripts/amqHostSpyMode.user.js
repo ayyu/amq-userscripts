@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name          AMQ Spy Host
 // @namespace     https://github.com/ayyu/
-// @version       0.5
-// @description   Hosts spies mode. Use /host_spies to start it and /end_spies to stop it.
+// @version       0.6
+// @description   Hosts spies mode. Use /host_spies to start it and /end_spies to stop it. Thank you to kempanator for settings code.
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
 // @grant         none
@@ -42,6 +42,16 @@ const hostActionDelay = 500;
 
 const pastebin = 'https://pastebin.com/Q1Z35czX';
 
+const commandPrefix = '/';
+const baseCommand = 'spy';
+const subCommands = {
+  'start': startSpiesSession,
+  'stop': endSpiesSession,
+  'rules': sendRulesInRoomChat,
+  'resend': messageTargets,
+  'settings': changeSpyLobbySettings,
+};
+
 class Spy {
   constructor(player, target = null) {
     this.player = player;
@@ -67,6 +77,7 @@ function assignTargets(spies) {
 }
 
 function messageTargets(spies) {
+  if (!isGameHost()) return;
   spies.forEach((spy, i) => setTimeout(sendTargetPrivateMessage, hostActionDelay*i, spy.player, spy.target));
 }
 
@@ -79,7 +90,7 @@ function sendTargetPrivateMessage(assassin, target) {
 }
 
 function gameStarting(data) {
-  if (!hosting) return;
+  if (!isGameHost()) return;
   continuing = true;
   for (const key in data.players) spies.push(new Spy(data.players[key]));
   assignTargets(spies);
@@ -87,10 +98,13 @@ function gameStarting(data) {
 }
 
 function lobbyTick() {
-  if (!hosting || !lobby.isHost || !lobby.inLobby) return;
+  if (!isGameHost() || !lobby.inLobby) return;
 
   // reset countdown to maximum if there aren't enough players in the lobby
-  if (lobby.numberOfPlayersReady < minPlayersToStart) lobbyCountdown = (continuing) ? continuingGameInitCountdown : newGameInitCountdown;
+  if (lobby.numberOfPlayersReady < minPlayersToStart) {
+    lobbyCountdown = (continuing) ? continuingGameInitCountdown : newGameInitCountdown;
+    return;
+  }
 
   if (lobbyCountdown == 0) {
     socket.sendCommand({
@@ -101,20 +115,20 @@ function lobbyTick() {
   }
 
   if (lobbyCountdown % 10 == 0 || lobbyCountdown <= 5) {
-    sendRoomMessage(`The next game will start in ${lobbyCountdown} seconds.`);
+    sendHostingMessage(`The next game will start in ${lobbyCountdown} seconds.`);
   }
   if (lobbyCountdown % 5 == 0) {
     Object.keys(lobby.players)
       .map((key) => lobby.players[key])
       .filter((player) => !player.ready)
-      .forEach((player) => sendRoomMessage(`@${player.name} ready up before the game starts.`));
+      .forEach((player) => sendHostingMessage(`@${player.name} ready up before the game starts.`));
   }
 
   lobbyCountdown--;
 }
 
 function answerResults(results) {
-  if (!hosting) return;
+  if (!isGameHost()) return;
   
   // need to find all players that looted this entry in case multiple people looted the same entry
   const looters = results.players
@@ -132,30 +146,30 @@ function answerResults(results) {
 
   // nobody dies if all players answer correctly to discourage picking Teekyuu
   if (correctPlayers.length == results.players.length) {
-    sendRoomMessage(`Nobody died because all players answered correctly. Pick something harder next time.`);
+    sendHostingMessage(`Nobody died because all players answered correctly. Pick something harder next time.`);
   } else if (successfulAssassins.length == 0) {
-    sendRoomMessage(`Nobody died.`);
+    sendHostingMessage(`Nobody died.`);
   } else {
     successfulAssassins.forEach(assassin => {
       assassin.target.alive = false;
-      sendRoomMessage(`${assassin.target.player.name} :gun: ${assassin.player.name}`);
+      sendHostingMessage(`${assassin.target.player.name} :gun: ${assassin.player.name}`);
     });
   }
 
   // send recap message with all dead players
   const deadSpies = spies.filter(spy => !spy.alive);
-  sendRoomMessage((`:skull:: ${deadSpies.length > 0 ? deadSpies.map(spy => spy.player.name).join(', ') : ":egg:"}`));
+  sendHostingMessage((`:skull:: ${deadSpies.length > 0 ? deadSpies.map(spy => spy.player.name).join(', ') : ":egg:"}`));
 }
 
 function quizEndResult(results) {
-  if (!hosting) return;
+  if (!isGameHost()) return;
 
   let aliveSpies = spies.filter(spy => spy.alive);
 
   // kill all players who failed to loot a show
   aliveSpies.filter(spy => !spy.looted).forEach(spy => {
     spy.alive = false;
-    sendRoomMessage(`${spy.player.name} has died for not looting a show.`);
+    sendHostingMessage(`${spy.player.name} has died for not looting a show.`);
   });
 
   // check for a winner before killing any further players
@@ -169,7 +183,7 @@ function quizEndResult(results) {
   const lastPlaceGamePlayerIds = aliveResultStates.filter(state => state.endPosition === lastPlaceEndPosition).map(state => state.gamePlayerId);
   aliveSpies.filter(spy => lastPlaceGamePlayerIds.includes(spy.player.gamePlayerId)).forEach(loser => {
     loser.alive = false;
-    sendRoomMessage(`${loser.player.name} has died for being in last place.`);
+    sendHostingMessage(`${loser.player.name} has died for being in last place.`);
   });
 
   // check for winners again
@@ -189,7 +203,7 @@ function findWinners(aliveSpies, results) {
 }
 
 function endGame(winners) {
-  sendRoomMessage(`The game has ended. ${winners.length ? ':trophy: ' + winners.map(spy => spy.player.name).join(', ') : 'Everyone died.'}`);
+  sendHostingMessage(`The game has ended. ${winners.length ? ':trophy: ' + winners.map(spy => spy.player.name).join(', ') : 'Everyone died.'}`);
   // TODO: send message of chain of targets
   continuing = false;
 }
@@ -200,48 +214,124 @@ function filterQuizResultStatesBySpies(spies, resultStates) {
 }
 
 function quizOver() {
-  if (!hosting) return;
+  if (!isGameHost()) return;
   if (continuing) {
-    sendRoomMessage(`The game will continue with the remaining players.`);
+    sendHostingMessage(`The game will continue with the remaining players.`);
     lobbyCountdown = continuingGameInitCountdown;
     spies.filter(spy => !spy.alive).forEach((spy, i) => {
       setTimeout(movePlayerToSpec, hostActionDelay*i, spy.player.name);
     });
     spies.length = 0;
   } else {
-    sendRoomMessage(`A new Spy vs. Spy game is starting. Players may now join.`);
+    sendHostingMessage(`A new Spy vs. Spy game is starting. Players may now join.`);
     lobbyCountdown = newGameInitCountdown;
     spies.length = 0;
   }
 }
 
 function processChatCommand(payload) {
-  if (hosting && payload.message.startsWith('/resend_target')) {
-    assassin = spies.find(spy => spy.player.name == payload.sender);
-    if (assassin) sendTargetPrivateMessage(assassin.player, assassin.target);
+  if (payload.sender !== selfName || (!quiz.inQuiz && !lobby.inLobby)) return;
+  if (!payload.message.startsWith(commandPrefix + baseCommand)) return;
+  if (!lobby.isHost) {
+    gameChat.systemMessage('You must be the host of the lobby to use this command.');
+    return;
+  };
+  if (quiz.gameMode == 'Ranked' || lobby.settings.gameMode =='Ranked') {
+    gameChat.systemMessage('You may not use these commands in ranked.');
+    return;
   }
 
-  if (payload.sender !== selfName
-      || !lobby.isHost
-      || quiz.gameMode == 'Ranked'
-      || (!quiz.inQuiz && !lobby.inLobby)) return;
-      
-  if (payload.message.startsWith('/host_spies')) {
-    hosting = true;
-    continuing = false;
-    spies.length = 0;
-    sendRoomMessage(`Spy vs. Spy: ${pastebin}`);
-    lobbyCountdown = newGameInitCountdown;
-    lobbyInterval = setInterval(lobbyTick, 1000);
+  const args = payload.message.split(' ');
+  if (args.length == 1) {
+    helpMessage();
+    return;
   }
 
-  if (payload.message.startsWith('/end_spies')) {
-    hosting = false;
-    continuing = false;
-    spies.length = 0;
-    sendRoomMessage(`Spy vs. Spy hosting ended.`);
-    clearInterval(lobbyInterval);
+  for (const subCommand in subCommands) {
+    if (subCommand == args[1]) {
+      subCommands[subCommand]();
+      break;
+    }
   }
+}
+
+function startSpiesSession() {
+  if (hosting) {
+    gameChat.systemMessage('You are already hosting a spies game.');
+    return;
+  }
+  if (!lobby.inLobby || quiz.inQuiz) {
+    gameChat.systemMessage('You must be in a lobby and not in the middle of a quiz to start hosting.');
+    return;
+  }
+  if (hostModal.$showSelection.slider("getValue") !== quiz.SHOW_SELECTION_IDS.LOOTING) {
+    gameChat.systemMessage("Game mode must be set to Looting.");
+    return;
+  }
+  hosting = true;
+  continuing = false;
+  spies.length = 0;
+  sendRulesInRoomChat();
+  lobbyCountdown = newGameInitCountdown;
+  lobbyInterval = setInterval(lobbyTick, 1000);
+}
+
+function endSpiesSession() {
+  if (!hosting) {
+    gameChat.systemMessage('You are not hosting a spies game yet.');
+    return;
+  }
+  sendRoomMessage(`Spy vs. Spy hosting session ended.`);
+  hosting = false;
+  continuing = false;
+  spies.length = 0;
+  clearInterval(lobbyInterval);
+}
+
+function changeSpyLobbySettings() {
+  if (!lobby.isHost) {
+    gameChat.systemMessage('You must be the lobby host to change settings.');
+    return;
+  }
+
+  const settings = {
+    showSelection: quiz.SHOW_SELECTION_IDS.LOOTING,
+    inventorySize: {
+      randomOn: false,
+      standardValue: 1,
+    },
+    lootingTime: {
+      randomOn: false,
+      standardValue: 60,
+    },
+    numberOfSongs: 100,
+    songSelection: {
+      standardValue: 3,
+    },
+    songType: {
+      standardValue: {
+        openings: true,
+        endings: true,
+        inserts: true,
+      },
+    },
+    scoreType: 1,
+    modifiers: {
+      duplicates: false,
+    }
+  };
+  hostModal.changeSettings(settings);
+  setTimeout(lobby.changeGameSettings, 1);
+}
+
+function helpMessage() {
+  const subcommandKeys = [];
+  for (const subCommand in subCommands) subcommandKeys.push(subCommand);
+  sendRoomMessage(`Available commands: ${subcommandKeys.join(', ')}`);
+}
+
+function sendRulesInRoomChat(playerNameMention = null) {
+  sendRoomMessage(`${playerNameMention ? '@' + playerNameMention.name : ''} Spy vs. Spy game mode: ${pastebin}`);
 }
 
 function playerJoined(player) {
@@ -254,7 +344,7 @@ function specToPlayer(player) {
 }
 
 function blockPlayerJoin(player) {
-  sendRoomMessage(`@${player.name} There is still a game of spies ongoing. Wait for it to finish before joining.`);
+  sendHostingMessage(`@${player.name} There is still a game of spies ongoing. Wait for it to finish before joining.`);
   movePlayerToSpec(player.name);
 }
 
@@ -263,16 +353,24 @@ function specJoined(player) {
 }
 
 function joinMessage(player) {
-  sendRoomMessage(`@${player.name} Spy vs. Spy: ${pastebin}`);
+  sendRulesInRoomChat(player.name);
+}
+
+function sendHostingMessage(message) {
+  if (!isGameHost()) return;
+  sendRoomMessage(message);
 }
 
 function sendRoomMessage(message) {
-  if (!hosting || !lobby.isHost) return;
   socket.sendCommand({
     type: 'lobby',
     command: 'game chat message',
     data: { msg: message, teamMessage: false }
   });
+}
+
+function isGameHost() {
+  return lobby.isHost && hosting;
 }
 
 function movePlayerToSpec(playerName) {
