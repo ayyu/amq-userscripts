@@ -18,18 +18,18 @@ let loadInterval = setInterval(() => {
   }
 }, 500);
 
-let active = false;
-let ongoing = false;
+let hosting = false;
+let continuing = false;
 const spies = [];
 
 const minPlayers = 4;
-const startCountdown = 30;
-const ongoingCountdown = 15;
-let countdown;
+const newGameInitCountdown = 30;
+const continuingGameInitCountdown = 15;
+let lobbyCountdown;
 let lobbyInterval;
 let readyDelayed;
 
-const delay = 500;
+const messageDelay = 500;
 
 const pastebin = 'https://pastebin.com/Q1Z35czX';
 
@@ -60,7 +60,7 @@ function assignTargets() {
 }
 
 function messageTargets() {
-  spies.forEach((spy, i) => setTimeout(messageTarget, delay*i, spy.player, spy.target));
+  spies.forEach((spy, i) => setTimeout(messageTarget, messageDelay*i, spy.player, spy.target));
 }
 
 function messageTarget(assassin, target) {
@@ -81,40 +81,40 @@ function startGame() {
 }
 
 function gameStarting(data) {
-  if (!active) return;
+  if (!hosting) return;
   clearInterval(lobbyInterval);
-  ongoing = true;
+  continuing = true;
   for (const key in data.players) spies.push(new Spy(data.players[key]));
   assignTargets();
   messageTargets();
 }
 
 function lobbyTick() {
-  if (!active || !lobby.isHost ||  (!quiz.inQuiz && !lobby.inLobby)) return;
+  if (!hosting || !lobby.isHost ||  (!quiz.inQuiz && !lobby.inLobby)) return;
   if (lobby.numberOfPlayersReady >= minPlayers) {
-    if (countdown < 1) {
+    if (lobbyCountdown < 1) {
       if (!readyDelayed) {
         readyDelayed = true;
-        countdown = 5;
+        lobbyCountdown = 5;
         Object.keys(lobby.players)
           .map((key) => lobby.players[key])
           .filter((player) => !player.ready)
-          .forEach((player) => sendLobbyMessage(`@${player.name} ready up. There will be ${countdown} more seconds before the game begins.`));
+          .forEach((player) => sendLobbyMessage(`@${player.name} ready up. There will be ${lobbyCountdown} more seconds before the game begins.`));
       }
       startGame();
     } else {
-      if (countdown % 10 == 0 || countdown <= 5) {
-        sendLobbyMessage(`The next game will start in ${countdown} seconds.`);
+      if (lobbyCountdown % 10 == 0 || lobbyCountdown <= 5) {
+        sendLobbyMessage(`The next game will start in ${lobbyCountdown} seconds.`);
       }
-      countdown--;
+      lobbyCountdown--;
     }
   } else {
-    countdown = (ongoing) ? ongoingCountdown : startCountdown;
+    lobbyCountdown = (continuing) ? continuingGameInitCountdown : newGameInitCountdown;
   }
 }
 
 function answerResults(results) {
-  if (!active) return;
+  if (!hosting) return;
   
   const pickerIds = results.players
     .filter(player => player.looted)
@@ -141,7 +141,7 @@ function answerResults(results) {
 }
 
 function quizEndResult(results) {
-  if (!active) return;
+  if (!hosting) return;
   spies.forEach(spy => {
     if (!spy.rig) {
       spy.alive = false;
@@ -165,25 +165,25 @@ function checkWinners(aliveSpies, quizResults) {
   if (aliveSpies.length < minPlayers) {
     const winners = getEndPosition(aliveSpies, quizResults, true);
     sendLobbyMessage(formatWinners(winners));
-    ongoing = false;
+    continuing = false;
     return true;
   }
   return false;
 }
 
 function quizOver() {
-  if (!active) return;
-  if (ongoing) {
+  if (!hosting) return;
+  if (continuing) {
     sendLobbyMessage(`The game will continue with the remaining players.`);
-    countdown = ongoingCountdown;
+    lobbyCountdown = continuingGameInitCountdown;
     const deadSpies = spies.filter(spy => !spy.alive);
     deadSpies.forEach((spy, i) => {
-      setTimeout(movePlayerToSpec, delay*i, spy.player.name);
+      setTimeout(movePlayerToSpec, messageDelay*i, spy.player.name);
     });
     spies.length = 0;
   } else {
     sendLobbyMessage(`A new Spy vs. Spy game is starting. Players may now join.`);
-    countdown = startCountdown;
+    lobbyCountdown = newGameInitCountdown;
     spies.length = 0;
   }
   lobbyInterval = setInterval(lobbyTick, 1000);
@@ -207,7 +207,7 @@ function filterSortAliveResults(aliveSpies, quizResults) {
 }
 
 function processChatCommand(payload) {
-  if (active && payload.message.startsWith('/resend_target')) {
+  if (hosting && payload.message.startsWith('/resend_target')) {
     assassin = spies.find(spy => spy.player.name == payload.sender);
     if (assassin) messageTarget(assassin.player, assassin.target);
   }
@@ -218,17 +218,17 @@ function processChatCommand(payload) {
       || (!quiz.inQuiz && !lobby.inLobby)) return;
       
   if (payload.message.startsWith('/host_spies')) {
-    active = true;
-    ongoing = false;
+    hosting = true;
+    continuing = false;
     spies.length = 0;
     sendLobbyMessage(`Spy vs. Spy: ${pastebin}`);
-    countdown = startCountdown;
+    lobbyCountdown = newGameInitCountdown;
     lobbyInterval = setInterval(lobbyTick, 1000);
   }
 
   if (payload.message.startsWith('/end_spies')) {
-    active = false;
-    ongoing = false;
+    hosting = false;
+    continuing = false;
     spies.length = 0;
     sendLobbyMessage(`Spy vs. Spy hosting ended.`);
     clearInterval(lobbyInterval);
@@ -248,12 +248,12 @@ function formatDeadSpies(deadSpies) {
 }
 
 function playerJoined(player) {
-  if (active && ongoing) blockPlayerJoin(player);
+  if (hosting && continuing) blockPlayerJoin(player);
   joinMessage(player);
 }
 
 function specToPlayer(player) {
-  if (active && ongoing) blockPlayerJoin(player);
+  if (hosting && continuing) blockPlayerJoin(player);
 }
 
 function blockPlayerJoin(player) {
@@ -270,7 +270,7 @@ function joinMessage(player) {
 }
 
 function sendLobbyMessage(message) {
-  if (!active || !lobby.isHost) return;
+  if (!hosting || !lobby.isHost) return;
   socket.sendCommand({
     type: 'lobby',
     command: 'game chat message',
