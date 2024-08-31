@@ -47,13 +47,12 @@ class Spy {
   constructor(player, target = null) {
     this.player = player;
     this.target = target;
-    this.score = 0;
     this.alive = true;
     this.rig = false;
   }
 }
 
-// knuth
+// Fisher-Yates
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -63,10 +62,9 @@ function shuffleArray(array) {
 
 function assignTargets() {
   shuffleArray(spies);
-  const numSpies = spies.length;
-  for (let i = 0; i < numSpies; i++) {
-    spies[i].target = spies[(i + 1) % numSpies].player;
-  }
+  spies.forEach((spy, i, spies) => {
+    spy.target = spies[(i + 1) % spies.length].player;
+  });
 }
 
 function messageTargets() {
