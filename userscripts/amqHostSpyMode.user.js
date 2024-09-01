@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Spy Host
 // @namespace     https://github.com/ayyu/
-// @version       0.6
+// @version       0.7
 // @description   Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
@@ -61,38 +61,14 @@ const subCommands = {
     'callback': resendTargets,
     'description': 'resends private messages to each player for their target in case they didn`t receive it',
   },
+  'settings': {
+    'callback': changeSpyLobbySettings,
+    'description': 'changes necessary settings for battle royale mode',
+  },
   'help': {
     'callback': helpMessage,
     'description': 'prints this help message',
   },
-  //'settings': changeSpyLobbySettings,
-};
-
-const baseSettings = {
-  showSelection: quiz.SHOW_SELECTION_IDS.LOOTING,
-  inventorySize: {
-    randomOn: false,
-    standardValue: 1,
-  },
-  lootingTime: {
-    randomOn: false,
-    standardValue: 60,
-  },
-  numberOfSongs: 100,
-  songSelection: {
-    standardValue: 3,
-  },
-  songType: {
-    standardValue: {
-      openings: true,
-      endings: true,
-      inserts: true,
-    },
-  },
-  scoreType: 1,
-  modifiers: {
-    duplicates: false,
-  }
 };
 
 class Spy {
@@ -343,8 +319,22 @@ function changeSpyLobbySettings() {
     gameChat.systemMessage('You must be the lobby host to change settings.');
     return;
   }
-  hostModal.changeSettings(baseSettings);
-  setTimeout(() => {lobby.changeGameSettings()}, 1);
+  // battle royal
+  hostModal.$showSelection.slider('setValue', quiz.SHOW_SELECTION_IDS.LOOTING);
+  hostModal.$scoring.slider('setValue', quiz.SCORE_TYPE_IDS.COUNT);
+  // looting settings
+  hostModal.inventorySizeSliderCombo.setValue(1);
+  hostModal.inventorySizeRandomSwitch.setOn(false);
+  hostModal.lootingTimeSliderCombo.setValue(60);
+  hostModal.lootingTimeRandomSwitch.setOn(false);
+  if (!hostModal.$lootDropping.is(':checked')) hostModal.$lootDropping.click();
+  // only watched
+  hostModal.numberOfSongsSliderCombo.setValue(100);
+  hostModal.watchedSliderCombo.setValue(100);
+  // disable dupes
+  if (hostModal.$duplicateShows.is(':checked')) hostModal.$duplicateShows.click();
+
+  lobby.changeGameSettings();
 }
 
 function resendTargets() {
