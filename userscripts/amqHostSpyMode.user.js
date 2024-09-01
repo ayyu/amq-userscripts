@@ -45,10 +45,26 @@ const pastebin = 'https://pastebin.com/Q1Z35czX';
 const commandPrefix = '/';
 const baseCommand = 'spy';
 const subCommands = {
-  'start': startSpiesSession,
-  'stop': endSpiesSession,
-  'rules': sendRulesInRoomChat,
-  'resend': resendTargets,
+  'start': {
+    'callback': startSpiesSession,
+    'description': 'starts hosting a Spy vs. Spy game session',
+  },
+  'stop': {
+    'callback': endSpiesSession,
+    'description': 'stops hosting a Spy vs. Spy game session',
+  },
+  'rules': {
+    'callback': sendRulesInRoomChat,
+    'description': 'sends a link to the pastebin containing the rules',
+  },
+  'resend': {
+    'callback': resendTargets,
+    'description': 'resends private messages to each player for their target in case they didn`t receive it',
+  },
+  'help': {
+    'callback': helpMessage,
+    'description': 'prints this help message',
+  },
   //'settings': changeSpyLobbySettings,
 };
 
@@ -104,7 +120,6 @@ function assignTargets(spies) {
 }
 
 function messageTargets(spies) {
-  if (!isGameHost()) return;
   spies.forEach((spy, i) => setTimeout(sendTargetPrivateMessage, hostActionDelay*i, spy.player, spy.target));
 }
 
@@ -284,7 +299,7 @@ function processChatCommand(payload) {
 
   for (const subCommand in subCommands) {
     if (subCommand == args[1]) {
-      subCommands[subCommand]();
+      subCommands[subCommand].callback();
       break;
     }
   }
@@ -333,13 +348,16 @@ function changeSpyLobbySettings() {
 }
 
 function resendTargets() {
+  if (!isGameHost()) return;
   messageTargets(spies);
 }
 
 function helpMessage() {
-  const subcommandKeys = [];
-  for (const subCommand in subCommands) subcommandKeys.push(subCommand);
-  sendRoomMessage(`Available commands: ${subcommandKeys.join(', ')}`);
+  gameChat.systemMessage('usage: /spy [subcommand]');
+  gameChat.systemMessage('subcommands:');
+  for (const subCommand in subCommands) {
+    gameChat.systemMessage(`${subCommand}: ${subCommands[subCommand].description}`);
+  }
 }
 
 function sendRulesInRoomChat(mentionPlayer = null) {
