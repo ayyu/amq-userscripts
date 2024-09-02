@@ -15,15 +15,22 @@ Use at your own peril.
 
 ## `amqHostSpyMode.user.js`
 
-Automatically hosts Spy vs. Spy mode. Does the following:
+Automatically hosts Spy vs. Spy mode. See [this pastebin](https://pastebin.com/Q1Z35czX) for details.
 
-- Starts lobby upon countdown finishing
-- Prevent people from joining in the middle of a multi-round game
-- Send DMs for targets
-- Keep track of alive players and targets
-- Kill players for answering their assassin's rig, or for finishing in last place
-- Determines winner(s)
-- Move dead players to spec
+The script works by:
+
+1. Counting down while in the lobby before starting a game
+2. Sending private messages to each player as the round starts for their target
+3. Managing which players are alive during the round
+    - Kills players for answering their assassin's rig
+    - Sends messages after each song as a reminder for who is still alive
+4. Kills last place at the end of the game
+5. Continues multi-round games if more than 4 players are alive at the end of any round
+    - Moves all dead players from the previous round to spectate
+6. Automatically forces new players to spectate if there is an ongoing multi-round game
+7. Determines the winner once there are less than 4 players alive
+
+If anyone wants to turn this into a bot that automatically hosts rooms that would be cool.
 
 ## `amqHotkeys.user.js`
 
@@ -42,7 +49,7 @@ Choose the following settings in the lobby before starting, if desired:
 
 ## `amqMuteOnAnswer.user.js`
 
-Mutes the current song once you answer or the replay phase starts, and unmutes audio back on once the next song starts.
+Mutes the current song once you answer or the replay phase starts, and unmutes audio once the next song starts.
 
 ## `amqVideoBackground.user.js`
 
