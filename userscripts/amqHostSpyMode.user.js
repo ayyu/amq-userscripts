@@ -21,6 +21,8 @@ let loadInterval = setInterval(() => {
   }
 }, 500);
 
+const version = "0.8.3";
+
 // Booleans for whether the script is active and whether there is an ongoing multi-round game
 let hosting = false;
 let continuing = false;
@@ -431,3 +433,11 @@ function setup() {
   new Listener("quiz end result", quizEndResult).bindListener();
   new Listener("quiz over", quizOver).bindListener();
 }
+
+AMQ_addScriptData({
+  name: "Spy Host",
+  author: "ayyu",
+  version: version,
+  link: "https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js",
+  description: `<p>Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.</p>`
+});
