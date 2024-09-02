@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Spy Host
 // @namespace     https://github.com/ayyu/
-// @version       0.8.3
+// @version       0.8.4
 // @description   Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
@@ -166,9 +166,9 @@ function answerResults(results) {
       successfulAssassins.push(assassin);
   }
 
-  // nobody dies if all players answer correctly to discourage picking Teekyuu
-  if (correctPlayers.length == results.players.length) {
-    sendHostingMessage(`Nobody died because all players answered correctly. Pick something harder next time.`);
+  // nobody dies if all alive players answer correctly to discourage picking Teekyuu
+  if (correctPlayers.length == spies.filter(spy => spy.alive).length) {
+    sendHostingMessage(`Nobody died because all remaining players answered correctly. Pick something harder next time.`);
   } else if (successfulAssassins.length == 0) {
     sendHostingMessage(`Nobody died.`);
   } else {
