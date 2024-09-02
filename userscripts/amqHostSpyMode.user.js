@@ -1,23 +1,27 @@
 // ==UserScript==
 // @name          AMQ Spy Host
 // @namespace     https://github.com/ayyu/
-// @version       0.8.2
+// @version       0.8.3
 // @description   Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
 // @grant         none
-// @require       https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
+// @require       https://raw.githubusercontent.com/joske2865/AMQ-Scripts/master/common/amqScriptInfo.js
 // @downloadURL   https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js
 // @updateURL     https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js
 // ==/UserScript==
 
-if (document.getElementById('startPage')) return;
+// Wait for page to load
+"use strict";
+if (typeof Listener === "undefined") return;
 let loadInterval = setInterval(() => {
-  if (document.getElementById("loadingScreen").classList.contains("hidden")) {
-    setup();
+  if ($("#loadingScreen").hasClass("hidden")) {
     clearInterval(loadInterval);
+    setup();
   }
 }, 500);
+
+const version = "0.8.3";
 
 // Booleans for whether the script is active and whether there is an ongoing multi-round game
 let hosting = false;
@@ -110,7 +114,7 @@ function sendTargetPrivateMessage(assassin, target) {
 function gameStarting(data) {
   if (!isGameHost()) return;
   continuing = true;
-  for (const key in data.players) spies.push(new Spy(data.players[key]));
+  for (const player of data.players) spies.push(new Spy(player));
   assignTargets(spies);
   messageTargets(spies);
 }
@@ -429,3 +433,11 @@ function setup() {
   new Listener("quiz end result", quizEndResult).bindListener();
   new Listener("quiz over", quizOver).bindListener();
 }
+
+AMQ_addScriptData({
+  name: "Spy Host",
+  author: "ayyu",
+  version: version,
+  link: "https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js",
+  description: `<p>Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.</p>`
+});
