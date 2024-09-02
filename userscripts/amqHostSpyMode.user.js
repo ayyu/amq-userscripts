@@ -244,15 +244,23 @@ function quizOver() {
   if (continuing) {
     sendHostingMessage(`The game will continue with the remaining players.`);
     lobbyCountdown = continuingGameInitCountdown;
-    spies.filter(spy => !spy.alive).forEach((spy, i) => {
+    const deadSpies = spies.filter(spy => !spy.alive);
+    deadSpies.forEach((spy, i) => {
       setTimeout(movePlayerToSpec, hostActionDelay*i, spy.player.name);
     });
-    spies.length = 0;
+    // open lobby only to # of alive players
+    setTimeout((roomSize) => {
+      hostModal.roomSizeSliderCombo.setValue(roomSize);
+      lobby.changeGameSettings();
+    }, hostActionDelay*(deadSpies.length + 2), spies.filter(spy => spy.alive).length)
   } else {
     sendHostingMessage(`A new Spy vs. Spy game is starting. Players may now join.`);
     lobbyCountdown = newGameInitCountdown;
-    spies.length = 0;
+    // open lobby to max # of players
+    hostModal.roomSizeSliderCombo.setValue(hostModal.roomSizeSliderCombo.max);
+    lobby.changeGameSettings();
   }
+  spies.length = 0;
 }
 
 function processChatCommand(payload) {
@@ -307,7 +315,7 @@ function endSpiesSession() {
     gameChat.systemMessage('You are not hosting a spies game yet.');
     return;
   }
-  sendRoomMessage(`Spy vs. Spy hosting session ended.`);
+  sendHostingMessage(`Spy vs. Spy hosting session ended.`);
   hosting = false;
   continuing = false;
   spies.length = 0;
@@ -333,7 +341,9 @@ function changeSpyLobbySettings() {
   hostModal.watchedSliderCombo.setValue(100);
   // disable dupes
   if (hostModal.$duplicateShows.is(':checked')) hostModal.$duplicateShows.click();
-
+  // maximum lobby size
+  hostModal.roomSizeSliderCombo.setValue(hostModal.roomSizeSliderCombo.max);
+  
   lobby.changeGameSettings();
 }
 
