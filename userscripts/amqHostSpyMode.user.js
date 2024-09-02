@@ -114,7 +114,7 @@ function sendTargetPrivateMessage(assassin, target) {
 function gameStarting(data) {
   if (!isGameHost()) return;
   continuing = true;
-  for (const key in data.players) spies.push(new Spy(data.players[key]));
+  for (const player of data.players) spies.push(new Spy(player));
   assignTargets(spies);
   messageTargets(spies);
 }
