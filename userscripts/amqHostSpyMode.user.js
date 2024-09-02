@@ -6,7 +6,7 @@
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
 // @grant         none
-// @require       https://raw.githubusercontent.com/TheJoseph98/AMQ-Scripts/master/common/amqScriptInfo.js
+// @require       https://raw.githubusercontent.com/joske2865/AMQ-Scripts/master/common/amqScriptInfo.js
 // @downloadURL   https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js
 // @updateURL     https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js
 // ==/UserScript==
