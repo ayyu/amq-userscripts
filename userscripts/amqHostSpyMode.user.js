@@ -11,11 +11,13 @@
 // @updateURL     https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js
 // ==/UserScript==
 
-if (document.getElementById('startPage')) return;
+// Wait for page to load
+"use strict";
+if (typeof Listener === "undefined") return;
 let loadInterval = setInterval(() => {
-  if (document.getElementById("loadingScreen").classList.contains("hidden")) {
-    setup();
+  if ($("#loadingScreen").hasClass("hidden")) {
     clearInterval(loadInterval);
+    setup();
   }
 }, 500);
 
