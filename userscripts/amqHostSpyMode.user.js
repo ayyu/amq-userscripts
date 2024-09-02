@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Spy Host
 // @namespace     https://github.com/ayyu/
-// @version       0.8.1
+// @version       0.8.2
 // @description   Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
@@ -38,7 +38,7 @@ let lobbyCountdown;
 let lobbyInterval;
 
 // milliseconds to delay between each chat message sent to the players to avoid rate limiting
-const hostActionDelay = 250;
+const hostActionDelay = 500;
 
 const pastebin = 'https://pastebin.com/Q1Z35czX';
 
