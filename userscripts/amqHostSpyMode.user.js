@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Spy Host
 // @namespace     https://github.com/ayyu/
-// @version       0.8
+// @version       0.8.1
 // @description   Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
