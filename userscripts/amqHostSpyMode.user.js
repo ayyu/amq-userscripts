@@ -293,7 +293,7 @@ function processChatCommand(payload) {
 
   for (const subCommand in subCommands) {
     if (subCommand == args[1]) {
-      subCommands[subCommand].callback();
+      subCommands[subCommand].callback(args.slice(2));
       break;
     }
   }
