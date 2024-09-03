@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Spy Host
 // @namespace     https://github.com/ayyu/
-// @version       0.8.4
+// @version       0.8.5
 // @description   Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
@@ -76,9 +76,10 @@ const subCommands = {
 };
 
 class Spy {
-  constructor(player, target = null) {
+  constructor(player, target = null, assassin = null) {
     this.player = player;
     this.target = target;
+    this.assassin = assassin;
     this.alive = true;
     this.looted = false;
   }
@@ -114,7 +115,7 @@ function sendTargetPrivateMessage(assassin, target) {
 function gameStarting(data) {
   if (!isGameHost()) return;
   continuing = true;
-  for (const player of data.players) spies.push(new Spy(player));
+  data.players.forEach(player => spies.push(new Spy(player)));
   assignTargets(spies);
   messageTargets(spies);
 }
@@ -159,13 +160,13 @@ function answerResults(results) {
     .filter(player => player.correct);
   
   const successfulAssassins = [];
-  for (const looter of looters) {
+  looters.forEach(looter => {
     const assassin = spies.find(spy => spy.player.gamePlayerId == looter.gamePlayerId);
     assassin.looted = true;
     if (correctPlayers.map(player => player.gamePlayerId).includes(assassin.target.player.gamePlayerId))
       successfulAssassins.push(assassin);
-  }
-
+  });
+  
   // nobody dies if all alive players answer correctly to discourage picking Teekyuu
   if (correctPlayers.length == spies.filter(spy => spy.alive).length) {
     sendHostingMessage(`Nobody died because all remaining players answered correctly. Pick something harder next time.`);
@@ -174,13 +175,14 @@ function answerResults(results) {
   } else {
     successfulAssassins.forEach(assassin => {
       assassin.target.alive = false;
+      assassin.target.assassin = assassin;
       sendHostingMessage(`${assassin.target.player.name} :gun: ${assassin.player.name}`);
     });
   }
 
   // send recap message with all dead players
   const deadSpies = spies.filter(spy => !spy.alive);
-  sendHostingMessage((`:skull:: ${deadSpies.length > 0 ? deadSpies.map(spy => spy.player.name).join(', ') : ":egg:"}`));
+  sendHostingMessage((`:skull:: ${deadSpies.length > 0 ? deadSpies.map(spy => `${spy.player.name} :gun: ${spy.assassin.player.name}`).join(', ') : ":egg:"}`));
 }
 
 function quizEndResult(results) {
@@ -437,7 +439,7 @@ function setup() {
 AMQ_addScriptData({
   name: "Spy Host",
   author: "ayyu",
-  version: version,
+  // version: version, too much work to update this LOL who cares
   link: "https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js",
   description: `<p>Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.</p>`
 });
