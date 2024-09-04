@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Spy Host
 // @namespace     https://github.com/ayyu/
-// @version       0.8.6
+// @version       0.8.7
 // @description   Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
@@ -21,7 +21,7 @@ let loadInterval = setInterval(() => {
   }
 }, 500);
 
-const version = "0.8.3";
+const version = "0.8.7";
 
 // Booleans for whether the script is active and whether there is an ongoing multi-round game
 let hosting = false;
@@ -435,7 +435,7 @@ function setup() {
 AMQ_addScriptData({
   name: "Spy Host",
   author: "ayyu",
-  // version: version, too much work to update this LOL who cares
+  version: version,
   link: "https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js",
   description: `<p>Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.</p>`
 });
