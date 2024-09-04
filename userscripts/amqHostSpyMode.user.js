@@ -258,17 +258,9 @@ function quizOver() {
     deadSpies.forEach((spy, i) => {
       setTimeout(movePlayerToSpec, hostActionDelay*i, spy.player.name);
     });
-    // open lobby only to # of alive players
-    setTimeout((roomSize) => {
-      hostModal.roomSizeSliderCombo.setValue(roomSize);
-      lobby.changeGameSettings();
-    }, hostActionDelay*(deadSpies.length + 2), spies.filter(spy => spy.alive).length)
   } else {
     sendHostingMessage(`A new Spy vs. Spy game is starting. Players may now join.`);
     lobbyCountdown = newGameInitCountdown;
-    // open lobby to max # of players
-    hostModal.roomSizeSliderCombo.setValue(hostModal.roomSizeSliderCombo.max);
-    lobby.changeGameSettings();
   }
   spies.length = 0;
 }
