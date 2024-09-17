@@ -42,7 +42,7 @@ let lobbyCountdown;
 let lobbyInterval;
 
 // milliseconds to delay between each chat message sent to the players to avoid rate limiting
-const hostActionDelay = 500;
+const hostActionDelay = 750;
 
 const pastebin = 'https://pastebin.com/Q1Z35czX';
 
