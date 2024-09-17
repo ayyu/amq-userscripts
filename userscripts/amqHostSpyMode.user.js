@@ -266,7 +266,7 @@ function quizOver() {
     hostModal.roomSizeSliderCombo.setValue(hostModal.roomSizeSliderCombo.max);
     lobby.changeGameSettings();
   }
-  spies.length = 0;
+  releaseSpies();
 }
 
 function processChatCommand(payload) {
@@ -310,7 +310,7 @@ function startSpiesSession() {
   }
   hosting = true;
   continuing = false;
-  spies.length = 0;
+  releaseSpies();
   sendRulesInRoomChat();
   lobbyCountdown = newGameInitCountdown;
   lobbyInterval = setInterval(lobbyTick, 1000);
@@ -324,8 +324,17 @@ function endSpiesSession() {
   sendHostingMessage(`Spy vs. Spy hosting session ended.`);
   hosting = false;
   continuing = false;
-  spies.length = 0;
+  releaseSpies();
   clearInterval(lobbyInterval);
+}
+
+function releaseSpies() {
+  spies.forEach(spy => {
+    spy.player = null;
+    spy.target = null;
+    spy.assassin = null;
+  })
+  spies.length = 0;
 }
 
 function changeSpyLobbySettings() {
