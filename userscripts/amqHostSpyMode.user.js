@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Spy Host
 // @namespace     https://github.com/ayyu/
-// @version       0.8.7
+// @version       0.9.0
 // @description   Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
@@ -21,7 +21,7 @@ let loadInterval = setInterval(() => {
   }
 }, 500);
 
-const version = "0.8.7";
+const version = "0.9";
 
 // Booleans for whether the script is active and whether there is an ongoing multi-round game
 let hosting = false;
