@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          AMQ Spy Host
 // @namespace     https://github.com/ayyu/
-// @version       0.8.5
+// @version       0.8.7
 // @description   Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.
 // @author        ayyu
 // @match         https://animemusicquiz.com/*
@@ -21,7 +21,7 @@ let loadInterval = setInterval(() => {
   }
 }, 500);
 
-const version = "0.8.3";
+const version = "0.8.7";
 
 // Booleans for whether the script is active and whether there is an ongoing multi-round game
 let hosting = false;
@@ -158,17 +158,21 @@ function answerResults(results) {
     .filter(player => player.looted)
   const correctPlayers = results.players
     .filter(player => player.correct);
+  const correctPlayerIds = correctPlayers.map(player => player.gamePlayerId);
   
   const successfulAssassins = [];
   looters.forEach(looter => {
     const assassin = spies.find(spy => spy.player.gamePlayerId == looter.gamePlayerId);
     assassin.looted = true;
-    if (correctPlayers.map(player => player.gamePlayerId).includes(assassin.target.player.gamePlayerId))
+    if (correctPlayerIds.includes(assassin.target.player.gamePlayerId))
       successfulAssassins.push(assassin);
   });
   
   // nobody dies if all alive players answer correctly to discourage picking Teekyuu
-  if (correctPlayers.length == spies.filter(spy => spy.alive).length) {
+  // this rule only applies outside of an endgame
+  const aliveSpies = spies.filter(spy => spy.alive);
+  const correctAliveSpies = aliveSpies.filter(spy => correctPlayerIds.includes(spy.player.gamePlayerId));
+  if (correctAliveSpies.length >= aliveSpies.length && aliveSpies.length >= minPlayers) {
     sendHostingMessage(`Nobody died because all remaining players answered correctly. Pick something harder next time.`);
   } else if (successfulAssassins.length == 0) {
     sendHostingMessage(`Nobody died.`);
@@ -254,17 +258,9 @@ function quizOver() {
     deadSpies.forEach((spy, i) => {
       setTimeout(movePlayerToSpec, hostActionDelay*i, spy.player.name);
     });
-    // open lobby only to # of alive players
-    setTimeout((roomSize) => {
-      hostModal.roomSizeSliderCombo.setValue(roomSize);
-      lobby.changeGameSettings();
-    }, hostActionDelay*(deadSpies.length + 2), spies.filter(spy => spy.alive).length)
   } else {
     sendHostingMessage(`A new Spy vs. Spy game is starting. Players may now join.`);
     lobbyCountdown = newGameInitCountdown;
-    // open lobby to max # of players
-    hostModal.roomSizeSliderCombo.setValue(hostModal.roomSizeSliderCombo.max);
-    lobby.changeGameSettings();
   }
   releaseSpies();
 }
@@ -289,7 +285,7 @@ function processChatCommand(payload) {
 
   for (const subCommand in subCommands) {
     if (subCommand == args[1]) {
-      subCommands[subCommand].callback();
+      subCommands[subCommand].callback(args.slice(2));
       break;
     }
   }
@@ -448,7 +444,7 @@ function setup() {
 AMQ_addScriptData({
   name: "Spy Host",
   author: "ayyu",
-  // version: version, too much work to update this LOL who cares
+  version: version,
   link: "https://raw.githubusercontent.com/ayyu/amq-userscripts/master/userscripts/amqHostSpyMode.user.js",
   description: `<p>Hosts Spy vs. Spy game mode. Use /spy start to start it and /spy stop to stop it.</p>`
 });
